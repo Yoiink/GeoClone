@@ -11,6 +11,102 @@
 //			Music Created by: http://goo.gl/LwUWn				//
 //////////////////////////////////////////////////////////////////////////////////////////
 
+Update - 31/12/2012
+
+New Functionality
+-----------------
+
+- Highscores
+
+Code Additions
+--------------
+
+- Added a couple of functions to read and write to a highscore text file.
+- Fixed up the sound manager as I noticed it was creating memory for every sound I played instead
+  of playing a pre-loaded file.
+
+Tests
+-----
+
+- Had the game running for a while to see if memory was still getting allocated from the audio which it
+  no longer is.
+
+Notes
+-----
+For future updates, I need to really start adding some more enemy spawning waves and try get the
+second game mode working. Also need to think where I could add some animation as I don't really need
+any at the moment. 
+
+Could do with sorting out enemy spawns so that they don't just spawn and kill the player instantly so 
+I'll add a cooldown or something which I have been playing with already.
+
+______________________________________________________________________________________________________
+
+Milestone 5 - 20/12/2012
+
+New Functionality
+-----------------
+
+- Menus
+- Grid warping
+- Sound Manager
+
+Code Additions
+--------------
+
+- The grid has changed on how it's drawn. Now every intersection is a point in a vector.
+- Each entity is checked against every point on the grid to see if it should distort it.
+- Menu systems have been added in place to give the game a more solid feel. Also will be used
+  to allow the use of switching game modes.
+- Changed the line drawing function as the one I wrote was slightly broke at certain times as I
+  found when the grid warping started to work. 
+- Added a sound manager for loading and playing audio using FMOD. I may be using this in future if
+  I get the time to slow/speed up the music depending on power ups (If I add them too...)
+
+Tests
+-----
+
+- Various tests were done on the menues as switching between them is the main point in them so I've
+  tested them a lot and think they're solid enough...
+- The grid tests were simple too, mainly just shooting bullets and moving about to see how I affected
+  each point on the grid.
+
+Notes
+-----
+No real milestones anymore, just fixing stuff. I would like to move to pre-allocated memory for entities
+and such but I think I'll leave that to the very last thing as it could cause big problems.
+
+______________________________________________________________________________________________________
+
+Milestone 4 - 10/12/2012
+
+New Functionality
+-----------------
+
+- Enemies no longer overlap (of the same type)
+- Particles
+
+Code Additions
+--------------
+
+- Enemies will no longer overlap creating a ball like group.
+- New class ParticleEmitter which has information on different particle systems
+- Fixed parallax by calculating offset and then adding them to the entities while I am updating.
+- Memory leaks fixed
+
+Tests
+-----
+
+- Parallax test was simple to test, just move about and the enemies should retain there position on the grid.
+
+Notes
+-----
+Next milestone (20/12/2012):
+# Grid warping
+# Menu system
+
+______________________________________________________________________________________________________
+
 
 Milestone 3 <V9> - 02/12/2012
 

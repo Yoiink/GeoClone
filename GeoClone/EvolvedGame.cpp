@@ -7,7 +7,6 @@
 
 EvolvedGame::EvolvedGame(void) : _spawnMode(0), _timeLastSpawn(0), _spawnComplete(true), _spawnWave(0), _spawnCooldown(3000), _gameScore(0), _bgPosX(-1024), _bgPosY(-530)
 {
-	//_bgParallax = new Asset();
 }
 
 
@@ -77,11 +76,6 @@ bool EvolvedGame::loadAssets(){
 	return true;
 }
 
-
-//std::shared_ptr<std::vector<std::shared_ptr<Asset>>> EvolvedGame::getGameAssetsPtr() const{
-//	return _gameAssets;
-//}
-
 std::shared_ptr<Asset> EvolvedGame::getAsset(int assetID) const{
 	return _gameAssets.at(assetID);
 }
@@ -129,9 +123,27 @@ void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList,
 		//		float angle = (enemyCount * (360.0f / maxEnemies));
 		//		float xAdd = 1*cos(angle);
 		//		float yAdd = 1*sin(angle);
+		//		int spawnDistance = 300;
 
-		//		entityList.push_front(std::shared_ptr<Enemy>(new Enemy(32, 32, Geo.getX() + (xAdd * 300), Geo.getY() + (yAdd * 300), 2, ENEMY_PURPLE, getAssetID("enemy_purple"))));
-		//		entityList.front()->setDeathTexture(getAssetID("particle_purple"));
+		//		float calcSpawnX = Geo->getX() + (xAdd * spawnDistance);
+		//		float calcSpawnY = Geo->getY() + (yAdd * spawnDistance);
+
+		//		if(calcSpawnX < playLeft)
+		//			calcSpawnX = playLeft + 10;
+		//		
+
+		//		if(calcSpawnY < playTop)
+		//			calcSpawnY = playTop + 10;
+		//		
+
+		//		if(calcSpawnX > playRight)
+		//			calcSpawnX = playRight - 40;
+
+		//		if(calcSpawnY > playBottom)
+		//			calcSpawnY = playBottom - 40;
+
+		//		entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(calcSpawnX, calcSpawnY, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+		//		sound->playAudio(PURPLE_SPAWN);
 
 		//		_spawnCooldown = _currentTime + 1000;
 

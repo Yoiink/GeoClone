@@ -1,6 +1,6 @@
 #include "World.h"
 #include "Draw.h"
-#include "GameObject.h"
+//#include "GameObject.h"
 #include "Player.h"
 #include "ControlInput.h"
 #include "Bullet.h"
@@ -186,16 +186,17 @@ void World::update(){
 
 	if(_inMenues){
 		_controllers->updateControllers();
-		HAPI_TControllerData playerOne = _controllers->getXbox();
+		HAPI_TControllerData controllerData = _controllers->getXbox();
 		HAPI_TKeyboardData keyboardData = _controllers->getKeyboard();
 
-		if(playerOne.digitalButtons[HK_DIGITAL_DPAD_UP] || playerOne.digitalButtons[HK_DIGITAL_DPAD_DOWN]){
+		if(controllerData.digitalButtons[HK_DIGITAL_DPAD_UP] || controllerData.digitalButtons[HK_DIGITAL_DPAD_DOWN] ||
+			keyboardData.scanCode['W'] || keyboardData.scanCode['S']){
 			int changeDirection = 0;
 
-			if(playerOne.digitalButtons[HK_DIGITAL_DPAD_UP])
+			if(controllerData.digitalButtons[HK_DIGITAL_DPAD_UP] || keyboardData.scanCode['W'])
 				changeDirection -= 1;
 
-			if(playerOne.digitalButtons[HK_DIGITAL_DPAD_DOWN])
+			if(controllerData.digitalButtons[HK_DIGITAL_DPAD_DOWN] || keyboardData.scanCode['S'])
 				changeDirection += 1;
 
 			//Borrow the nextShot variable (normally used for bullets) to create a cooldown on the menu selection.
@@ -205,7 +206,7 @@ void World::update(){
 			}
 		}
 
-		if(playerOne.digitalButtons[HK_DIGITAL_A]){
+		if(controllerData.digitalButtons[HK_DIGITAL_A] || keyboardData.scanCode[HK_SPACE]){
 			//Borrow the nextShot variable (normally used for bullets) to create a cooldown on the menu selection.
 			if(HAPI->GetTime() > _nextShot){
 				_gameMenu->selectedItem(_inMenues, _gameMenu, shared_from_this());
@@ -229,7 +230,7 @@ void World::update(){
 
 #pragma region PCInput
 
-		HAPI_TControllerData playerOne = _controllers->getXbox();
+		
 		HAPI_TKeyboardData keyboardData = _controllers->getKeyboard();
 		HAPI_TMouseData mouseData = _controllers->getMouse();
 
@@ -237,21 +238,37 @@ void World::update(){
 		if(mouseData.leftButtonDown){
 			if(_currentTime > _nextShot){
 
-				//HAPI->PlayASound(_gameMode->getFireSoundAsset()->getSound());
-				HAPI->PlayASound(_gameMode->getAsset(_gameMode->getAssetID("fire_normal"))->getSound());
+				//Play the bullet sound
+				_soundManager->playAudio(BULLET_SOUND);
 
-				//Calc angle, need to do X - shipX as that is the object we want the angle from.
-				float angle = static_cast<float>(floor(0.5 + (atan2( mouseData.y - _Geo->getY(), mouseData.x - _Geo->getX() ))));
+				//Calculate the angle to shoot the bullet at
+				float angle = atan2( mouseData.y - _Geo->getY(), mouseData.x - _Geo->getX() );
+
+				//Remove 5 degrees from shooting angle, as we shoot 3 bullets, we want to spray like \|/ so start 5 degrees less
+				//Hard coded so less calculation at runtime
+				angle -= 0.08726646259f;
 
 				float bulletX = _Geo->getX() + (_Geo->getWidth() / 2) - 8;
 				float bulletY = _Geo->getY() + (_Geo->getHeight() / 2) - 8;
 
-				_entityList.push_front(std::shared_ptr<Bullet>(new Bullet(16,16, bulletX, bulletY, 1.f*cosf(angle), 1.f*sinf(angle), _Geo->getSpeed(), angle + 1.5f) ));
-				_entityList.front()->setTexture(_gameMode->getAssetID("bullet"));
+				//Loop over each bullet and set it up, need to loop to apply the different angle
+				for(int curBullet = 0; curBullet < 3; curBullet++){
+					_entityList.push_front(std::shared_ptr<Bullet>(new Bullet(16,16, bulletX, bulletY, 
+						1*cosf(angle + ((curBullet * 5) * static_cast<float>(M_PI) / 180.f)),
+						1*sinf(angle + ((curBullet * 5) * static_cast<float>(M_PI) / 180.f)),
+						10.f + rand() % 3, angle + 1.5f) ));
 
-				_nextShot = _currentTime + 210;
+					_entityList.front()->setTexture(_gameMode->getAssetID("bullet"));
+					_entityList.front()->setDeathTexture(_gameMode->getAssetID("particle_bullet"));
+				}
+
+				//Add delay to the currentTime to create the delay for the next bullet.
+				_nextShot = _currentTime + 100;
 
 			}
+
+
+
 		}
 
 		//Keyboard WASD
@@ -281,158 +298,137 @@ void World::update(){
 				modX += 3;
 			}
 
+			//If we're going diagonal, remove 1 to slow it down to around about the correct speed
+			if(modX != 0 && modY != 0){
+				if(modY < 0){
+					modY += 1;
+				} else {
+					modY -= 1;
+				}
+
+				if(modX < 0){
+					modX += 1;
+				} else {
+					modX -= 1;
+				}
+			}
+
 			float newX = _Geo->getX() + modX * _deltaTime;
 			float newY = _Geo->getY() + modY * _deltaTime;
-			_Geo->setAngle(static_cast<float>(floor(0.5 + atan2(modY, modX))));
+			float angle = static_cast<float>(atan2(modY, modX));
+			_Geo->setAngle(angle);
 
-
-			//if( (newX > _render->getWidth() / _render->getScreenBoundry()) && (newX < _render->getWidth() - (_render->getWidth() / _render->getScreenBoundry()) - Geo->getTextureWidth() ) ){
-			if( (newX > _render->getGridX()) && (newX < (_render->getGridX() + _render->getWidth() - _Geo->getWidth()) )){
+			//Check if the newX position is within the correct bounds (X axis)
+			if( (newX > _render->getGridX() + 5) && (newX < (_render->getGridX() + _render->getWidth() - (_Geo->getWidth() + 5)) )){
 				_Geo->setX(newX);
 			}
-			//}
 
-			//if( (newY > _render->getHeight() / _render->getScreenBoundry()) && (newY < _render->getHeight() - (_render->getHeight() / _render->getScreenBoundry()) - Geo->getTextureHeight() ) ){
-			if ( (newY > _render->getGridY()) && (newY < (_render->getGridY() + _render->getHeight() - _Geo->getHeight()) )){
+			//Check if the newY position is within the correct bounds (Y axis)
+			if ( (newY > _render->getGridY() + 5) && (newY < (_render->getGridY() + _render->getHeight() - (_Geo->getHeight() + 5)) )){
 				_Geo->setY(newY);
 			}
-			//}
 
-			//Currently sets speed, however if the play moves right, the bullet still goes fast when shot left, this shouldn't happen.
-			float speedX = abs(modX / 3.0f * 10.0f);
-			float speedY = abs(modY / 3.0f * 10.0f);
-
-			float calculatedSpeed = speedX + speedY;
-
-			if(calculatedSpeed > 10){
-				calculatedSpeed = 10;
-			}
-
-			_Geo->setSpeed(calculatedSpeed);
-			_movementInput = true;
+			//Create an emitter for the tail of Geo using the opposit angle
+			_emitterList.push_back(std::shared_ptr<ParticleEmitter>(new ParticleEmitter(_Geo->getX() + _Geo->getWidth() / 2, _Geo->getY() + _Geo->getHeight() / 2, 1, _gameMode->getAssetID("particle_trail"), angle - static_cast<float>(floor(0.5 + M_PI)))));
 
 		}
 
-		//Keyboard input, more info (VKeys): http://www.siongboon.com/projects/2007-12-08_ascii_code/index.htm
+		//Pause if P is pressed
 		if(keyboardData.scanCode['P']){
-			//DO PAUSE
+			_inMenues = true;
+			_gameMenu.reset(new PauseMenu(_soundManager));
 		}
 
 #pragma endregion mouse and keyboard input
 
 #pragma region XboxInput
 
-		//Left Stick
+		HAPI_TControllerData controllerData = _controllers->getXbox();
+
+		//Left Stick OR WASD
 		//Offset X/Y
-		if(playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] > HK_GAMEPAD_LEFT_THUMB_DEADZONE || playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] > HK_GAMEPAD_LEFT_THUMB_DEADZONE ||
-			playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] < -HK_GAMEPAD_LEFT_THUMB_DEADZONE || playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] < -HK_GAMEPAD_LEFT_THUMB_DEADZONE ){
+		if(controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] > HK_GAMEPAD_LEFT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] > HK_GAMEPAD_LEFT_THUMB_DEADZONE ||
+			controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] < -HK_GAMEPAD_LEFT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] < -HK_GAMEPAD_LEFT_THUMB_DEADZONE ){
 
 				//Give Geo an angle so it can be rendered correctly later.
-				float angle = atan2( ((playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] * -1) - _Geo->getY()), playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] - _Geo->getX());
+				float angle = atan2( ((controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] * -1) - _Geo->getY()), controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] - _Geo->getX());
 				_Geo->setAngle(angle);
 
-				float newX = (_Geo->getX() + ((playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] / 10000.0f) * _deltaTime));
-				float newY = (_Geo->getY() + (((playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] / 10000.0f) * -1) * _deltaTime));
+				//Calculate the new X and Y position of Geo
+				float newX = (_Geo->getX() + ((controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] / 10000.0f) * _deltaTime));
+				float newY = (_Geo->getY() + (((controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] / 10000.0f) * -1) * _deltaTime));
 
-
-
-				//if( (newX > _render->getWidth() / _render->getScreenBoundry()) && (newX < _render->getWidth() - (_render->getWidth() / _render->getScreenBoundry()) - Geo->getTextureWidth() ) ){
+				//Check if the newX position is within the correct bounds (X axis)
 				if( (newX > _render->getGridX() + 5) && (newX < (_render->getGridX() + _render->getWidth() - (_Geo->getWidth() + 5)) )){
 					_Geo->setX(newX);
-					_Geo->setDirectionX(1*cos(angle));
 				}
-				//}
 
-				//if( (newY > _render->getHeight() / _render->getScreenBoundry()) && (newY < _render->getHeight() - (_render->getHeight() / _render->getScreenBoundry()) - Geo->getTextureHeight() ) ){
+				//Check if the newY position is within the correct bounds (Y axis)
 				if ( (newY > _render->getGridY() + 5) && (newY < (_render->getGridY() + _render->getHeight() - (_Geo->getHeight() + 5)) )){
 					_Geo->setY(newY);
-					_Geo->setDirectionY(1*sin(angle));
 				}
-				//}
 
-				//Create the Geo Trail
+				//Create an emitter for the tail of Geo using the opposit angle
 				_emitterList.push_back(std::shared_ptr<ParticleEmitter>(new ParticleEmitter(_Geo->getX() + _Geo->getWidth() / 2, _Geo->getY() + _Geo->getHeight() / 2, 1, _gameMode->getAssetID("particle_trail"), angle - static_cast<float>(floor(0.5 + M_PI)))));
-
-
-				//Currently sets speed, however if the play moves right, the bullet still goes fast when shot left, this shouldn't happen.
-				float speedX = abs((playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] / 32767.0f) * 10);
-				float speedY = abs(((playerOne.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] / 32767.0f) * -1) * 10);
-
-
-				float calculatedSpeed = speedX + speedY;
-
-				if(calculatedSpeed > 10){
-					calculatedSpeed = 10;
-				}
-
-				_Geo->setSpeed(calculatedSpeed);
-				_movementInput = true;
 
 		} 
 
-		if(!_movementInput){
-			_Geo->setSpeed(3);
-		}
-
-		_movementInput = false;
-
 		//Right Stick
-		if(playerOne.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] > HK_GAMEPAD_RIGHT_THUMB_DEADZONE || playerOne.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] > HK_GAMEPAD_RIGHT_THUMB_DEADZONE ||
-			playerOne.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] < -HK_GAMEPAD_RIGHT_THUMB_DEADZONE || playerOne.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] < -HK_GAMEPAD_RIGHT_THUMB_DEADZONE ){
+		if(controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] > HK_GAMEPAD_RIGHT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] > HK_GAMEPAD_RIGHT_THUMB_DEADZONE ||
+			controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] < -HK_GAMEPAD_RIGHT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] < -HK_GAMEPAD_RIGHT_THUMB_DEADZONE ){
 
+				//Check to see if enough time has passed to shoot a bullet
 				if(_currentTime > _nextShot){
 
-					//HAPI->PlayASound(_gameMode->getAsset(_gameMode->getAssetID("bullet"))->getSound());
+					//Play the bullet sound
 					_soundManager->playAudio(BULLET_SOUND);
 
-					//Calc angle, need to do X - shipX as that is the object we want the angle from.
-					float angle = atan2( (playerOne.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] - _Geo->getX()) * -1, playerOne.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] - _Geo->getY());
+					//Calculate the angle to shoot the bullet at
+					float angle = atan2( (controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] - _Geo->getX()) * -1, controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] - _Geo->getY());
 
 					//Remove 5 degrees from shooting angle, as we shoot 3 bullets, we want to spray like \|/ so start 5 degrees less
-					angle -= static_cast<float>(floor( 0.5 + (5 * M_PI / 180.0)));
+					//Hard coded so less calculation at runtime
+					angle -= 0.08726646259f;
 
 					float bulletX = _Geo->getX() + (_Geo->getWidth() / 2) - 8;
 					float bulletY = _Geo->getY() + (_Geo->getHeight() / 2) - 8;
 
+					//Loop over each bullet and set it up, need to loop to apply the different angle
 					for(int curBullet = 0; curBullet < 3; curBullet++){
 						_entityList.push_front(std::shared_ptr<Bullet>(new Bullet(16,16, bulletX, bulletY, 
 							1*cosf(angle + ((curBullet * 5) * static_cast<float>(M_PI) / 180.f)),
 							1*sinf(angle + ((curBullet * 5) * static_cast<float>(M_PI) / 180.f)),
-							_Geo->getSpeed() + rand() % 3, angle + 1.5f) ));
+							10.f + rand() % 3, angle + 1.5f) ));
 
 						_entityList.front()->setTexture(_gameMode->getAssetID("bullet"));
 						_entityList.front()->setDeathTexture(_gameMode->getAssetID("particle_bullet"));
 					}
 
+					//Add delay to the currentTime to create the delay for the next bullet.
 					_nextShot = _currentTime + 100;
 
 				}
 
-				//Dbug
-				//std::string debugStick = "Thumb X: " + std::to_string(playerOne->analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X]) 
-				//						+ " Thumb Y: " + std::to_string(playerOne->analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y])
-				//						+ " Calced Angle: " + std::to_string(angle);
-				//HAPI->RenderText(0, (screenHeight - 75), HAPI_TColour(255, 0, 0), debugStick);
-
 		}
 
-		if(playerOne.digitalButtons[HK_DIGITAL_START]){
+		//If the start button is pressed, launch the paused menu
+		if(controllerData.digitalButtons[HK_DIGITAL_START]){
 			_inMenues = true;
 			_gameMenu.reset(new PauseMenu(_soundManager));
 		}
 
 
-		if(playerOne.digitalButtons[HK_DIGITAL_RIGHT_SHOULDER]){
+		if(controllerData.digitalButtons[HK_DIGITAL_RIGHT_SHOULDER]){
 			setGraphicsSettings(!getGraphicsSettings());
 		}
 
 
 		//Test setting channel frequency
-		//if(playerOne->digitalButtons[HK_DIGITAL_Y]){
+		//if(controllerData->digitalButtons[HK_DIGITAL_Y]){
 		//			channel->setFrequency(60000);
-		//} else if(playerOne->digitalButtons[HK_DIGITAL_A]){
+		//} else if(controllerData->digitalButtons[HK_DIGITAL_A]){
 		//			channel->setFrequency(30000);
-		//} else if(playerOne->digitalButtons[HK_DIGITAL_X]){
+		//} else if(controllerData->digitalButtons[HK_DIGITAL_X]){
 		//			channel->setFrequency(48000);
 		//}
 
@@ -444,21 +440,15 @@ void World::update(){
 		//See if we need to spawn anything
 		_gameMode->spawnWaves(_entityList, _render, _Geo, _soundManager);
 
-		//currentMode->updateParallax(Geo);
-
-		//int changeInX = 0;
-		//int changeInY = 0;
-
+		//Update the grid position
 		_render->updateParallax(_Geo);
 
-		//Clear screen - Default black
+		//Clear screen berfore drawing - Default black
 		_render->setScreenCol();
 
 		//Draw the screen gridbox
 		_render->updateGrid(_deltaTime);
 		_render->drawGridBox(_Geo);
-
-		//currentMode->renderParallax(screen);
 
 		//Update emitters and render -- Do this BEFORE entities or particles will appear over them
 		for(std::shared_ptr<ParticleEmitter> emitter : _emitterList){
@@ -473,26 +463,30 @@ void World::update(){
 			}
 		}
 
-		//Delete any emitters
+		//Delete any emitters - Using remove_if from list, this would need replacing when using vectors
 		_emitterList.remove_if([&](std::shared_ptr<ParticleEmitter> emitter) -> bool{
-			return !emitter->getAlive();
-		}
+				return !emitter->getAlive();
+			}
 		);
 
-		//Causes quite a significant drop in FPS - Fixes the Parallax issue though...
+		//Calculate the change that the grid has done which will be applied to all the entities.
+		//NOTE: Causes quite a significant drop in FPS - Fixes the Parallax issue though...
 		float changeInGridX = _render->getGridX() - _render->getLastGridX();
 		float changeInGridY = _render->getGridY() - _render->getLastGridY();
 
 		//Loop over and Update/Chase, Check Collision.
 		for(std::shared_ptr<GameObject> entity : _entityList){
 
+			//Update the entity position to be relative to the grid
 			entity->setX(entity->getX() + changeInGridX);
 			entity->setY(entity->getY() + changeInGridY);
 
-			entity->Update(_deltaTime);
-			entity->Chase(_Geo, _deltaTime);
-			_render->distortGrid(entity);
+			entity->Update(_deltaTime);			//Current used to update frame animations
+			entity->Chase(_Geo, _deltaTime);	//If the entity is an enemy, it will call the correct chase function
+			_render->distortGrid(entity);		//Distort the grid a little depending on entity position.
 
+			//Check for a collision.
+			//Ideally this would be +1 of entity, but using a list so can't do that.
 			for(std::shared_ptr<GameObject> checkAgainst : _entityList){
 				if(entity != checkAgainst){
 					entity->CheckCollision(checkAgainst);
@@ -511,7 +505,7 @@ void World::update(){
 
 		}
 
-		//Check if player has died
+		//Check if player has died, if they have, write to the highscore file and create the game over menu.
 		if(!_Geo->getAlive()){
 			_inMenues = true;
 			writeHighscore(_gameMode->getHighscore());
@@ -532,6 +526,7 @@ void World::update(){
 					}
 
 					//If the entity is of type ENEMY_PURPLE then spawn little purple enemies
+					//Ideally, this would be done on death but this is unique to the purple enemy at the moment.
 					if(entity->getObjectType() == ENEMY_PURPLE){
 						//Could have a for loop here and calculate using cos/sin but it's probably cheaper just to have 3 of the same lines
 						_entityList.push_front(std::shared_ptr<Enemy>(new Enemy(8, 8, entity->getX() + 16.f, entity->getY() - 16.f, 2, ENEMY_PURPLE_MINI, _gameMode->getAssetID("enemy_purple_mini"), _gameMode->getAssetID("particle_purple"))));
@@ -548,9 +543,6 @@ void World::update(){
 			}
 		}
 		);
-
-		_render->drawLine(0, 0, 400, 400);
-
 
 		//Render game score/hud
 		_gameMode->renderHUD(*_render);

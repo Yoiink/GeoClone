@@ -4,8 +4,7 @@
 #include <memory>
 #include <vector>
 
-#define LOAD_IMAGE			0
-#define LOAD_AUDIO			1
+enum assetType{LOAD_IMAGE, LOAD_AUDIO};
 
 class Asset
 {

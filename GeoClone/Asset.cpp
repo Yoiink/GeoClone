@@ -13,16 +13,12 @@ Asset::~Asset(void)
 		delete[] frame;
 	}
 
-	//for(int frame = 0; frame < _assetArray.size(); frame++){
-	//	delete _assetArray[frame];
-	//	//_assetArray[frame] = NULL;
-	//}
-
 	//Had to initialise as _assetData(0) due to an asset not loading data. - Possibly due to sound file does not have any assetData!
 	delete[] _assetData;
 
 }
 
+//Load the asset, assetType is either LOAD_IMAGE or LOAD_AUDIO
 bool Asset::Load(const std::string &assetPath, int assetType, std::string assetName, int assetID){
 
 	_assetName = assetName;
@@ -30,8 +26,6 @@ bool Asset::Load(const std::string &assetPath, int assetType, std::string assetN
 
 	if(assetType == LOAD_IMAGE){
 		if(HAPI->LoadTexture(assetPath, &_assetData, &_width, &_height)){
-			//_assetArray.push_back(_assetData);
-			//delete _assetData;
 			return true;
 		} else {
 			HAPI->UserMessage("Unable to load '" + assetPath + "'. \n\n GeoClone will now close.", "Error Loading");
@@ -49,19 +43,13 @@ bool Asset::Load(const std::string &assetPath, int assetType, std::string assetN
 	}
 }
 
+//Loads an animation from the previously loaded asset, it will take frames specified from the width and height from top left to right, and continue's down the image.
 bool Asset::loadAnimation(int numFrames, int frameWidth, int frameHeight){
-
-	//delete[] _assetArray.front();
-	//_assetArray.pop_back();
-	//_assetArray.empty();
-	//_assetArray.pop_back();
 
 	_maxFrames = numFrames;
 
 	int sizeOfFrame = (frameWidth * frameHeight) * 4;
 	_assetArray.reserve(sizeOfFrame * numFrames);
-
-	//BYTE* tempData = new BYTE[frameWidth * 4];
 
 	int startFrameX = 0;
 	int startFrameY = 0;
@@ -75,32 +63,21 @@ bool Asset::loadAnimation(int numFrames, int frameWidth, int frameHeight){
 			startFrameY++;
 		}
 
-		//int startOffset = (((startFrameY * frameHeight) * _width) + (startFrameX * frameWidth)) * 4;
+
 		int startOffset =  (((startFrameY * frameHeight) * _width) * 4) + (startFrameX * frameWidth) * 4;
 
 		for(int curY = 0; curY < frameHeight; curY++){
-			//Copy to the array
-			memcpy(&frameData[(curY * frameWidth) * 4], &_assetData[startOffset + ((curY * _width) * 4)], (frameWidth * 4));
-
-			//_assetArray.insert(_assetArray.end(), _assetData + (startOffset + ((curY * _width) * 4)), _assetData + ((startOffset + ((curY * _width) * 4)) + (frameWidth * 4)));
-
-			//int frameDataOffset = (curY * frameWidth) * 4;
-			//int assetDataOffset = 0 + (curY * _width) * 4;
-			//int frameJump = frameWidth * 4;
+			memcpy(&frameData[(curY * frameWidth) * 4], &_assetData[startOffset + ((curY * _width) * 4)], (frameWidth * 4));		//Copy the strip of pixels to the frameData
 		}
 
 		startFrameX++;
 		_assetArray.push_back(frameData);
-		//delete[] frameData;
 
 	}
 
-	////Now setup the texture width/height to that of the animated frames
+	//Now setup the texture width/height to that of the animated frames (By default, it will be bigger)
 	_width = frameWidth;
 	_height = frameHeight;
-
-	//delete[] _assetArray.front();
-	//_assetArray.pop_back();
 
 	return true;
 

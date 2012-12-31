@@ -3,6 +3,8 @@
 #include <HAPI_lib.h>
 #include <memory>
 
+class Player;
+
 class ControlInput
 {
 public:
@@ -16,11 +18,11 @@ public:
 	HAPI_TMouseData getMouse() const;
 
 private:
-	//std::shared_ptr<HAPI_TControllerData> _controllerData;	//Xbox Data
+	//std::shared_ptr<HAPI_TControllerData> controllerData;	//Xbox Data
 	//std::shared_ptr<HAPI_TKeyboardData> _keyboardData;		//Keyboard Data
 	//std::shared_ptr<HAPI_TMouseData> _mouseData;			//Mouse Data
 
-	HAPI_TControllerData _controllerData;	//Xbox Data
+	HAPI_TControllerData controllerData;	//Xbox Data
 	HAPI_TKeyboardData _keyboardData;		//Keyboard Data
 	HAPI_TMouseData _mouseData;			//Mouse Data
 

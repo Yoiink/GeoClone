@@ -1,27 +1,31 @@
+#include <HAPI_lib.h>
+#include <assert.h>
+
 #include "Draw.h"
 #include "GameObject.h"
-#include <HAPI_lib.h>
-
 #include "EvolvedGame.h"
 
 Draw::Draw(std::shared_ptr<GameState> gameMode, int screenWidth, int screenHeight, int screenBoundry, int screenLines) : _screenWidth(screenWidth), _screenHeight(screenHeight), _screenSize((screenWidth * screenHeight) * 4), 
 		  _screenBoundry(screenBoundry), _screenLines(screenLines), _gridX(0), _gridY(0), _gameState(gameMode)
 {
+
 	if(!HAPI->Initialise(&screenWidth, &screenHeight))
 		return;
 
 	_pScreen = HAPI->GetScreenPointer();
 
+	//Calculate the x and y jump for the grid. Hard coded which is bad, would change if there was option to change resolutiuon.
 	float xJump = screenWidth / 50.f;
 	float yJump = screenHeight / 33.f;
 
-	//For loop should be 2 extra than the x/yJump to make up for outer ring
+	//For loop should be 2 extra than the x/yJump to make up for outer ring on the grid
 	for(int curPointY = 0; curPointY <= 35; curPointY++){
 		for(int curPointX = 0; curPointX <= 52; curPointX++){
 			_gridPoints.push_back(Point(curPointX * xJump, curPointY * yJump));
 		}
 	}
 
+	//This is used to limit the maximum change in position for the grid distort.
 	_maxPointChange = 20;
 
 }
@@ -108,14 +112,15 @@ bool Draw::drawLine(int startX, int startY, int endX, int endY, HAPI_TColour lin
 	if(startX == endX && startY == endY)
 		return true;
 
-	//
-	// Using algo from: http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#Simplification
-	// I had implemented it myself as shown in comments under the function. However, I found when
-	// I started the grid warping, that the game was hanging. Probably due to this gunction I wrote
-	// so, my best guess is that I needed to add something to break from the while(true).
-
-	// However being lazy, I did a Google and came over this which is what I'm using:
-	//	http://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C.2B.2B
+	/*
+		 Initially used algo from: http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#Simplification
+		 I had implemented it myself as shown in comments under the function. However, I found when
+		 I started the grid warping, that the game was hanging. Probably due to this function I wrote
+		 so, my best guess is that I needed to add something to break from the while(true).
+	
+		 However being lazy, I did a Google and came over this which is what I'm using:
+			http://rosettacode.org/wiki/Bitmap/Bresenham%27s_line_algorithm#C.2B.2B
+	*/
 
 	const bool steep = (endY - startY > endX - startX);
 	if(steep)
@@ -212,38 +217,9 @@ bool Draw::drawLine(int startX, int startY, int endX, int endY, HAPI_TColour lin
 
 }
 
-//bool Draw::drawGridBox(std::shared_ptr<GameObject> Geo){
-//
-//	int boundrySize = _screenBoundry;
-//	int gridLines = _screenLines;
-//
-//
-//	//Draw Lines (Grid) - hard coded a deep blue
-//	for(int startX = (_screenWidth / boundrySize); startX < _screenWidth - (_screenWidth / boundrySize); /* */){
-//		drawLine(startX, _screenHeight / boundrySize, startX, _screenHeight - _screenHeight / boundrySize);
-//		startX += (_screenWidth / gridLines);
-//	}
-//
-//	for(int startY = (_screenHeight / boundrySize); startY < _screenHeight - (_screenHeight / boundrySize); /* */){
-//		drawLine(_screenWidth / boundrySize, startY, _screenWidth - _screenWidth / boundrySize, startY);
-//		startY += (_screenHeight / gridLines);
-//	}
-//
-//	//Draw Lines (Box) - white
-//	drawLine(_screenWidth / boundrySize, _screenHeight / boundrySize, _screenWidth / boundrySize, _screenHeight - (_screenHeight / boundrySize), HAPI_TColour(255, 255, 255));
-//	drawLine(_screenWidth - _screenWidth / boundrySize, _screenHeight / boundrySize, _screenWidth - _screenWidth / boundrySize, _screenHeight - (_screenHeight / boundrySize), HAPI_TColour(255, 255, 255));
-//	drawLine(_screenWidth / boundrySize, _screenHeight / boundrySize, _screenWidth - _screenWidth / boundrySize, (_screenHeight / boundrySize), HAPI_TColour(255, 255, 255));
-//	drawLine(_screenWidth / boundrySize, _screenHeight - _screenHeight / boundrySize, _screenWidth - _screenWidth / boundrySize, _screenHeight - (_screenHeight / boundrySize), HAPI_TColour(255, 255, 255));
-//
-//
-//
-//
-//	return true;
-//
-//}
-
 void Draw::distortGrid(std::shared_ptr<GameObject> &entity){
 
+	//This variable is how much the grid will distroy if there is something on it.
 	int distortAmount = 5;
 
 	float entityLeft = entity->getX() - getGridX();
@@ -257,15 +233,17 @@ void Draw::distortGrid(std::shared_ptr<GameObject> &entity){
 			point.yPos > entityTop	&&
 			point.yPos < entityBottom){
 
+				//Calculate the angle from the entity to the grid point
 				float angle = atan2(point.yPos - entity->getY(), point.xPos - entity->getX());
 
+				//Use the angle to calculate the newX and newY positions
 				float newX = point.xPos + cosf(angle) * distortAmount;
 				float newY = point.yPos + sinf(angle) * distortAmount;
 
+				//Assign the newX/newY position if it's within the maxPointChange
 				if( newX > point.xReturn - _maxPointChange && newX < point.xReturn + _maxPointChange ){
 					point.xPos = newX;
 				}
-
 				if( newY > point.yReturn - _maxPointChange && newY < point.yReturn + _maxPointChange ){
 					point.yPos = newY;
 				}
@@ -277,25 +255,33 @@ void Draw::distortGrid(std::shared_ptr<GameObject> &entity){
 
 void Draw::updateGrid(const float &deltaTime){
 
+	//This is used to calculate the return speed of a grid point to it's original position.
 	int returnModifier = 20;
 
 	for(Point &p : _gridPoints){
 		//Horizontal return
 		if(p.xPos != p.xReturn){
 			if(p.xPos < p.xReturn){
+
 				float returnSpeed = (p.xReturn - p.xPos) / returnModifier;
+
+				//If the position is close to the original postion, just set it or it will be going into really small numbers.
 				if(p.xReturn - p.xPos < 0.5){
 					p.xPos = p.xReturn;
 				} else {
 					p.xPos += returnSpeed * deltaTime;
 				}
 			} else {
+
 				float returnSpeed = (p.xPos - p.xReturn) / returnModifier;
+
+				//If the position is close to the original postion, just set it or it will be going into really small numbers.
 				if(p.xReturn - p.xPos < 0.5){
 					p.xPos = p.xReturn;
 				} else {
 					p.xPos -= returnSpeed * deltaTime;
 				}
+
 			}
 		}
 
@@ -303,6 +289,8 @@ void Draw::updateGrid(const float &deltaTime){
 		if(p.yPos != p.yReturn){
 			if(p.yPos < p.yReturn){
 				float returnSpeed = (p.yReturn - p.yPos) / returnModifier;
+
+				//If the position is close to the original postion, just set it or it will be going into really small numbers.
 				if(p.yReturn - p.yPos < 0.5){
 					p.yPos = p.yReturn;
 				} else {
@@ -310,6 +298,8 @@ void Draw::updateGrid(const float &deltaTime){
 				}
 			} else {
 				float returnSpeed = (p.yPos - p.yReturn) / returnModifier;
+
+				//If the position is close to the original postion, just set it or it will be going into really small numbers.
 				if(p.yPos - p.yReturn < 0.5){
 					p.yPos = p.yReturn;
 				} else {
@@ -355,6 +345,11 @@ bool Draw::drawGridBox(std::shared_ptr<GameObject> Geo){
 			//				"Ey: " + std::to_string(endY));
 
 			HAPI_TColour lineColour(68,76,102);
+
+			/*
+				I'll leave this hear, it was some testing of what it wouyld look like if the grid
+				colours changed when something moved over it.
+			*/
 			//if(_gridPoints[arrayOffset].xPos != _gridPoints[arrayOffset].xReturn ||
 			//	_gridPoints[arrayOffset].yPos != _gridPoints[arrayOffset].yReturn){
 			//		//lineColour = HAPI_TColour(76, 109, 206);
@@ -369,55 +364,18 @@ bool Draw::drawGridBox(std::shared_ptr<GameObject> Geo){
 			drawLine(startX, startY, endX, startY, lineColour);
 			//Verticle line
 			drawLine(startX, startY, startX, endY, lineColour);
-
-			int b = 1;
 		}
 	}
 
 	//Draw Lines (Box) - white
-	drawLine(boundLeft, boundTop, boundRight, boundTop, HAPI_TColour(255, 255, 255));		//TL -> TR
-	drawLine(boundLeft, boundTop, boundLeft, boundBottom, HAPI_TColour(255, 255, 255));		//TL -> BR
-	drawLine(boundLeft, boundBottom, boundRight, boundBottom, HAPI_TColour(255, 255, 255)); //BL -> BR
-	drawLine(boundRight, boundTop, boundRight, boundBottom, HAPI_TColour(255, 255, 255));	//BR -> TR
+	drawLine(boundLeft, boundTop, boundRight, boundTop, HAPI_TColour(255, 255, 255));			//Top Left		-> Top Right
+	drawLine(boundLeft, boundTop, boundLeft, boundBottom, HAPI_TColour(255, 255, 255));			//Top Left		-> Bottom Right
+	drawLine(boundLeft, boundBottom, boundRight, boundBottom, HAPI_TColour(255, 255, 255));		//Bottom Left	-> Bottom Right
+	drawLine(boundRight, boundTop, boundRight, boundBottom, HAPI_TColour(255, 255, 255));		//Bottom Right	-> Top Right
 
 	return true;
 
 }
-
-//bool Draw::drawGridBox(std::shared_ptr<GameObject> Geo){
-//
-//	//int boundrySize = _screenBoundry;
-//	//int gridLines = _screenLines;
-//
-//	int boundrySize = _screenBoundry;
-//	int gridLinesH = 50;
-//	int gridLinesV = 33;
-//
-//	int boundTop =  _gridY;
-//	int boundLeft = _gridX;
-//	int boundRight = boundLeft + _screenWidth;
-//	int boundBottom = boundTop + _screenHeight;
-//
-//	//Draw Lines (Grid) - hard coded a deep blue
-//	for(int startX = boundLeft; startX < boundRight; /* */){
-//		drawLine(startX, boundTop, startX, boundBottom);
-//		startX += (boundRight - boundLeft) / gridLinesH;
-//	}
-//
-//	for(int startY = boundTop; startY < boundBottom; /* */){
-//		drawLine(boundLeft, startY, boundRight, startY);
-//		startY += (boundBottom - boundTop) / gridLinesV;
-//	}
-//
-//	//Draw Lines (Box) - white
-//	drawLine(boundLeft, boundTop, boundRight, boundTop, HAPI_TColour(255, 255, 255));		//TL -> TR
-//	drawLine(boundLeft, boundTop, boundLeft, boundBottom, HAPI_TColour(255, 255, 255));		//TL -> BR
-//	drawLine(boundLeft, boundBottom, boundRight, boundBottom, HAPI_TColour(255, 255, 255)); //BL -> BR
-//	drawLine(boundRight, boundTop, boundRight, boundBottom, HAPI_TColour(255, 255, 255));	//BR -> TR
-//
-//	return true;
-//
-//}
 
 bool Draw::drawGridBox(int boundrySize, int gridLines){
 
@@ -505,7 +463,7 @@ void Draw::speedRender(float drawPosX, float drawPosY, int drawWidth, int drawHe
 
 //A simple render function when data is passed in. (Main use for menu background/art)
 void Draw::Render(float drawPosX, float drawPosY, int drawWidth, int drawHeight, BYTE* textureData){
-		//if(_textureData != 0 && &screen != 0){
+	assert(textureData != 0);
 
 	int posX = static_cast<int>(floor(0.5 + drawPosX));
 	int posY = static_cast<int>(floor(0.5 + drawPosY));
@@ -561,7 +519,6 @@ void Draw::Render(float drawPosX, float drawPosY, int drawWidth, int drawHeight,
 }
 
 void Draw::Render(float drawPosX, float drawPosY, int drawWidth, int drawHeight, int assetID, float entityAngle, int frameNumber, bool floatCalc){
-	//if(_textureData != 0 && &screen != 0){
 
 	float posX = drawPosX;
 	float posY = drawPosY;
@@ -681,7 +638,6 @@ void Draw::Render(float drawPosX, float drawPosY, int drawWidth, int drawHeight,
 			}
 		
 		}
-	//}
 }
 
 
