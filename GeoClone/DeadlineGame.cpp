@@ -1,20 +1,20 @@
-#include "EvolvedGame.h"
+#include "DeadlineGame.h"
 //#include "Enemy.h"
 #include "EnemyPurple.h"
 #include "EnemyBlue.h"
 #include "SoundManager.h"
 
 
-EvolvedGame::EvolvedGame(void) : _spawnMode(0), _timeLastSpawn(0), _spawnComplete(true), _spawnWave(0), _spawnCooldown(3000), _gameScore(0), _bgPosX(-1024), _bgPosY(-530)
+DeadlineGame::DeadlineGame(void) : _spawnMode(0), _timeLastSpawn(0), _spawnComplete(true), _spawnWave(0), _spawnCooldown(3000), _gameScore(0), _gameTimer(180), _timeCheck(0), _lastTick(0), _bgPosX(-1024), _bgPosY(-530)
 {
 }
 
 
-EvolvedGame::~EvolvedGame(void)
+DeadlineGame::~DeadlineGame(void)
 {
 }
 
-bool EvolvedGame::loadAssets(){
+bool DeadlineGame::loadAssets(){
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
 	if(!(_gameAssets.back()->Load("images/bullet.png", LOAD_IMAGE, "bullet", _gameAssets.size() - 1)))
@@ -76,16 +76,16 @@ bool EvolvedGame::loadAssets(){
 	return true;
 }
 
-std::shared_ptr<Asset> EvolvedGame::getAsset(int assetID) const{
+std::shared_ptr<Asset> DeadlineGame::getAsset(int assetID) const{
 	return _gameAssets.at(assetID);
 }
 
-void EvolvedGame::resetScore(){
+void DeadlineGame::resetScore(){
 	_gameScore = 0;
 }
 
 //Change this to a bool? If there's a problem we're still setting the ID.
-int EvolvedGame::getAssetID(std::string assetName) const{
+int DeadlineGame::getAssetID(std::string assetName) const{
 	for(std::shared_ptr<Asset> curAsset : _gameAssets){
 		if(curAsset->getName() == assetName){
 			return curAsset->getID();
@@ -94,11 +94,11 @@ int EvolvedGame::getAssetID(std::string assetName) const{
 	return 0;
 }
 
-unsigned long int EvolvedGame::getHighscore() const{
+unsigned long int DeadlineGame::getHighscore() const{
 	return _gameScore;
 }
 
-void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList, std::shared_ptr<Draw> &screen, std::shared_ptr<GameObject> &Geo, std::shared_ptr<SoundManager> &sound){
+void DeadlineGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList, std::shared_ptr<Draw> &screen, std::shared_ptr<GameObject> &Geo, std::shared_ptr<SoundManager> &sound){
 
 	_currentTime = HAPI->GetTime();
 
@@ -233,7 +233,7 @@ void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList,
 	}
 }
 
-bool EvolvedGame::renderHUD(Draw &screen) const{
+bool DeadlineGame::renderHUD(Draw &screen) const{
 	HAPI->RenderText(screen.getWidth() / screen.getScreenBoundry() + 30, 20, HAPI_TColour(0, 255, 0), "SCORE");
 	HAPI->ChangeFont("Tahoma", 30, 100);
 
@@ -245,13 +245,17 @@ bool EvolvedGame::renderHUD(Draw &screen) const{
 	}
 
 	HAPI->RenderText(screen.getWidth() / screen.getScreenBoundry() + 30, 40, HAPI_TColour(0, 255, 0), currentScoreStr);
+
+	//Draw game counter (unique to Deadline)
+	HAPI->RenderText(screen.getWidth() / 2, 40, HAPI_TColour(0, 255, 0), std::to_string(_gameTimer));
+
 	HAPI->ChangeFont("Tahoma", 24, 100);
 	return true;
 }
 
 
 
-bool EvolvedGame::addScore(int entityID){
+bool DeadlineGame::addScore(int entityID){
 	switch(entityID){
 	case ENEMY_BLUE:
 		_gameScore += 100;
@@ -267,6 +271,17 @@ bool EvolvedGame::addScore(int entityID){
 	return true;
 }
 
-void EvolvedGame::update(std::shared_ptr<GameObject> Geo){
+void DeadlineGame::update(std::shared_ptr<GameObject> Geo){
 
+	if(_gameTimer == 0){
+		Geo->setIsAlive(false);
+	}
+
+	//Also going to use this to update the countdown
+	if(_timeCheck >= _lastTick + 1000){
+		_gameTimer -= 1;
+		_lastTick = HAPI->GetTime();
+	} else {
+		_timeCheck = HAPI->GetTime();
+	}
 }

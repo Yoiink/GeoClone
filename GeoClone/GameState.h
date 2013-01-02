@@ -37,7 +37,7 @@ public:
 	virtual bool renderHUD(Draw &screen) const = 0;
 	//virtual void renderParallax(Draw &screen) const = 0;
 
-	virtual void updateParallax(std::shared_ptr<GameObject> Geo) = 0;
+	virtual void update(std::shared_ptr<GameObject> Geo) = 0;
 
 };
 

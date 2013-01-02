@@ -4,7 +4,7 @@
 Player::Player(float xPos, float yPos) :
 	GameObject(32, 32, xPos, yPos, 0, 0, 0, 0, 0, true)
 {
-	_immunityTimer = 300000; //300 Seconds
+	_immunityTimer = 3000; //3 Seconds
 }
 
 

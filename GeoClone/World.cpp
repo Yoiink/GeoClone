@@ -14,6 +14,7 @@
 
 //Game Modes
 #include "EvolvedGame.h"
+#include "DeadlineGame.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -57,7 +58,8 @@ void World::loadMode(int gameID){
 		_soundManager->playAudio(EVOLVED_MUSIC);
 		_gameMode.reset(new EvolvedGame);
 	} else if(gameID == DEADLINE_GAME){
-		//Nothing yet.
+		_soundManager->playAudio(DEADLINE_MUSIC);
+		_gameMode.reset(new DeadlineGame);
 	}
 
 	_render->changeStatePtr(_gameMode);
@@ -439,6 +441,8 @@ void World::update(){
 
 		//See if we need to spawn anything
 		_gameMode->spawnWaves(_entityList, _render, _Geo, _soundManager);
+
+		_gameMode->update(_Geo);
 
 		//Update the grid position
 		_render->updateParallax(_Geo);

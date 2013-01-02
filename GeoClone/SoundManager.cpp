@@ -8,10 +8,9 @@ SoundManager::SoundManager(void)
 
 	//channel->setFrequency(48000); // 100 to 705600, -100 to -705600 (Really want a max of 70560)
 
-	FMOD::Sound  *myFile = loadSound("sounds/evolved.mp3", true);
-
 	_sounds.push_back(loadSound("sounds/evolved.mp3", true));
 	_sounds.push_back(loadSound("sounds/main_menu_music.ogg", true));
+	_sounds.push_back(loadSound("sounds/deadline.ogg", true));
 	_sounds.push_back(loadSound("sounds/menu_nav_sound.mp3"));
 	_sounds.push_back(loadSound("sounds/fire_normal.wav"));
 	_sounds.push_back(loadSound("sounds/enemy_explode.ogg"));
@@ -34,7 +33,7 @@ SoundManager::~SoundManager(void)
 
 void SoundManager::playAudio(int audioID){
 
-	if(audioID == MAIN_MENU_MUSIC || audioID == EVOLVED_MUSIC){
+	if(audioID == MAIN_MENU_MUSIC || audioID == EVOLVED_MUSIC || audioID == DEADLINE_MUSIC){
 		_musicChannel->setVolume(1);
 		_system->playSound(FMOD_CHANNEL_FREE, _sounds.at(audioID), false, &_musicChannel);
 	} else {

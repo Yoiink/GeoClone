@@ -91,7 +91,8 @@ void MainMenu::selectedItem(bool &inMenues, std::shared_ptr<MenuState> &gameMenu
 		case 0:
 			//_gameMode.reset(new EvolvedGame());
 			MenuState::getSoundManager()->stopMusic();
-			gameWorld->loadMode(EVOLVED_GAME);
+			//gameWorld->loadMode(EVOLVED_GAME);
+			gameWorld->loadMode(DEADLINE_GAME);
 			if(!gameWorld->setupWorld()){
 				HAPI->Close();
 				return;
