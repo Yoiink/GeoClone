@@ -1,5 +1,6 @@
 #include "PauseMenu.h"
 #include "MainMenu.h"
+#include "SelectMenu.h"
 #include <HAPI_lib.h>
 
 #include "World.h"
@@ -87,18 +88,15 @@ void PauseMenu::changeItem(int change){
 void PauseMenu::selectedItem(bool &inMenues, std::shared_ptr<MenuState> &gameMenu, std::shared_ptr<World> gameWorld){
 	switch(_selectedItem){
 		case 0:
-			//_gameMode.reset(new EvolvedGame());
-			//MenuState::getSoundManager()->stopMusic();
-			//gameWorld->loadMode(EVOLVED_GAME);
-			//if(!gameWorld->setupWorld()){
-			//	HAPI->Close();
-			//	return;
-			//}
 			inMenues = false;
 			MenuState::getSoundManager()->resumeMusic();
 			break;
 		case 1:
-			//MenuState::getSoundManager()->stopMusic();
+			MenuState::getSoundManager()->stopMusic();
+			MenuState::getSoundManager()->playAudio(MAIN_MENU_MUSIC);
+			gameMenu.reset(new SelectMenu(MenuState::getSoundManager()));
+			break;
+		case 2:
 			MenuState::getSoundManager()->stopMusic();
 			gameMenu.reset(new MainMenu(MenuState::getSoundManager()));
 			break;

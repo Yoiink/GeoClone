@@ -1,5 +1,6 @@
 #include "MainMenu.h"
 #include "OptionsMenu.h"
+#include "SelectMenu.h"
 #include <HAPI_lib.h>
 
 #include "World.h"
@@ -89,15 +90,17 @@ void MainMenu::changeItem(int change){
 void MainMenu::selectedItem(bool &inMenues, std::shared_ptr<MenuState> &gameMenu, std::shared_ptr<World> gameWorld){
 	switch(_selectedItem){
 		case 0:
-			//_gameMode.reset(new EvolvedGame());
-			MenuState::getSoundManager()->stopMusic();
-			//gameWorld->loadMode(EVOLVED_GAME);
-			gameWorld->loadMode(DEADLINE_GAME);
-			if(!gameWorld->setupWorld()){
-				HAPI->Close();
-				return;
-			}
-			inMenues = false;
+			////_gameMode.reset(new EvolvedGame());
+			//MenuState::getSoundManager()->stopMusic();
+			////gameWorld->loadMode(EVOLVED_GAME);
+			//gameWorld->loadMode(DEADLINE_GAME);
+			//if(!gameWorld->setupWorld()){
+			//	HAPI->Close();
+			//	return;
+			//}
+			//inMenues = false;
+			//break;
+			gameMenu.reset(new SelectMenu(MenuState::getSoundManager()));
 			break;
 		case 1:
 			//MenuState::getSoundManager()->stopMusic();

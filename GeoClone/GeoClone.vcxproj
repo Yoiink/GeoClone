@@ -177,6 +177,7 @@
     <ClCompile Include="ParticleEmitter.cpp" />
     <ClCompile Include="PauseMenu.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SelectMenu.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
@@ -200,6 +201,7 @@
     <ClInclude Include="PauseMenu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SelectMenu.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
