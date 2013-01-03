@@ -170,6 +170,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameOverMenu.cpp" />
     <ClCompile Include="GameState.cpp" />
+    <ClCompile Include="HowMenu.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MenuState.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameOverMenu.h" />
     <ClInclude Include="GameState.h" />
+    <ClInclude Include="HowMenu.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="MenuState.h" />
     <ClInclude Include="OptionsMenu.h" />

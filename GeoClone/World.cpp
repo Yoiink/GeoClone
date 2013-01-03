@@ -336,7 +336,7 @@ void World::update(){
 		}
 
 		//Pause if P is pressed
-		if(keyboardData.scanCode['P']){
+		if(keyboardData.scanCode[HK_ESCAPE]){
 			_inMenues = true;
 			_gameMenu.reset(new PauseMenu(_soundManager));
 		}
@@ -417,11 +417,6 @@ void World::update(){
 		if(controllerData.digitalButtons[HK_DIGITAL_START]){
 			_inMenues = true;
 			_gameMenu.reset(new PauseMenu(_soundManager));
-		}
-
-
-		if(controllerData.digitalButtons[HK_DIGITAL_RIGHT_SHOULDER]){
-			setGraphicsSettings(!getGraphicsSettings());
 		}
 
 

@@ -1,40 +1,33 @@
-#include "MainMenu.h"
-#include "OptionsMenu.h"
-#include "SelectMenu.h"
 #include "HowMenu.h"
 #include <HAPI_lib.h>
+#include "MainMenu.h"
 
 #include "World.h"
 #include "Asset.h"
 #include "Draw.h"
 #include "SoundManager.h"
 
-MainMenu::MainMenu(std::shared_ptr<SoundManager> &soundManager) :
+HowMenu::HowMenu(std::shared_ptr<SoundManager> &soundManager) :
 	MenuState(soundManager)
 {
-	//Spaces to align text, may be quicker than calculating their positions...
-	_menuItems.push_back("       Play");
-	_menuItems.push_back("    Options");
-	_menuItems.push_back(" How to Play");
-	_menuItems.push_back("  Exit Game");
+	_menuItems.push_back("     Back");
 	_startX = 400;
 	_startY = 200;
 	_selectedItem = 0;
-	MenuState::getSoundManager()->playAudio(MAIN_MENU_MUSIC);
 }
 
 
-MainMenu::~MainMenu(void)
+HowMenu::~HowMenu(void)
 {
 }
 
-void MainMenu::update(std::shared_ptr<Draw> &renderer){
 
+void HowMenu::update(std::shared_ptr<Draw> &renderer){
 	//Load assets if needed
 	if(_menuAssets.size() == 0){
 		//As this is true, it means we can use it as a constructor for startX and startY now we have access to Draw
-		_startX = (renderer->getWidth() / 2) - 80;
-		_startY = (renderer->getHeight() / 2) - 50;
+		_startX = (renderer->getWidth() / 2) - 120;
+		_startY = (renderer->getHeight() / 2) + 150;
 
 		if(!setupAssets()){				//If there are any issues, close the game.
 			HAPI->Close();
@@ -45,12 +38,15 @@ void MainMenu::update(std::shared_ptr<Draw> &renderer){
 	//Rendering the background will "clear" the screen
 	renderer->speedRender(0, 0, _menuAssets[0]->getWidth(), _menuAssets[0]->getHeight(), _menuAssets[0]->getTexture());
 
+	//Render the controls
+	renderer->Render(_startX - 400, _startY - 380, _menuAssets[5]->getWidth(), _menuAssets[5]->getHeight(), _menuAssets[5]->getTexture());
+
 	HAPI->ChangeFont("Tahoma", 30, 1000);
 	for(size_t curItem = 0; curItem < _menuItems.size(); curItem++){
 		if(curItem == _selectedItem){
-			HAPI->RenderText(_startX, _startY + (curItem * 80), HAPI_TColour(180, 255, 0), _menuItems[curItem]);
-			renderer->Render(_startX - (_menuAssets[1]->getWidth() / 2) + 80.f, 
-							_startY + (curItem * 80) - (_menuAssets[1]->getHeight() / 2) + 18.f,
+			HAPI->RenderText(_startX + 20, _startY + 140 + (curItem * 80), HAPI_TColour(180, 255, 0), _menuItems[curItem]);
+			renderer->Render(_startX + 20 - (_menuAssets[1]->getWidth() / 2) + 80.f, 
+							_startY + 140  + (curItem * 80) - (_menuAssets[1]->getHeight() / 2) + 18.f,
 							_menuAssets[1]->getWidth(), _menuAssets[1]->getHeight(), _menuAssets[1]->getTexture());
 		} else {
 			HAPI->RenderText(_startX, _startY + (curItem * 80), HAPI_TColour(0, 255, 0), _menuItems[curItem]);
@@ -63,19 +59,15 @@ void MainMenu::update(std::shared_ptr<Draw> &renderer){
 	//Smaller font for sub menu info
 	HAPI->ChangeFont("Tahoma", 20, 800);
 
-	//Render the UP/Down
-	HAPI->RenderText(_startX - 20, _startY + 345, HAPI_TColour(0, 255, 0), "Navigate");
-	renderer->Render(_startX - 80.f, _startY + 340.f, _menuAssets[3]->getWidth(), _menuAssets[3]->getHeight(), _menuAssets[3]->getTexture());
-
 	//Render the A Select
-	HAPI->RenderText(_startX + 140, _startY + 345, HAPI_TColour(0, 255, 0), "Select");
-	renderer->Render(_startX + 100.f, _startY + 340.f, _menuAssets[4]->getWidth(), _menuAssets[4]->getHeight(), _menuAssets[4]->getTexture());
+	HAPI->RenderText(_startX + 540, _startY + 155, HAPI_TColour(0, 255, 0), "Select");
+	renderer->Render(_startX + 500.f, _startY + 145.f, _menuAssets[4]->getWidth(), _menuAssets[4]->getHeight(), _menuAssets[4]->getTexture());
 
 	//Restore font size to 14 (for FPS and such)
 	HAPI->ChangeFont("Tahoma", 14, 800);
 }
 
-void MainMenu::changeItem(int change){
+void HowMenu::changeItem(int change){
 	_selectedItem += change;
 
 	if(_selectedItem < 0)
@@ -88,26 +80,17 @@ void MainMenu::changeItem(int change){
 	MenuState::getSoundManager()->playAudio(MAIN_MENU_NAV_SOUND);
 }
 
-void MainMenu::selectedItem(bool &inMenues, std::shared_ptr<MenuState> &gameMenu, std::shared_ptr<World> gameWorld){
+void HowMenu::selectedItem(bool &inMenues, std::shared_ptr<MenuState> &gameMenu, std::shared_ptr<World> gameWorld){
 	switch(_selectedItem){
 		case 0:
-			gameMenu.reset(new SelectMenu(MenuState::getSoundManager()));
-			break;
-		case 1:
-			gameMenu.reset(new OptionsMenu(MenuState::getSoundManager()));
-			break;
-		case 2:
-			gameMenu.reset(new HowMenu(MenuState::getSoundManager()));
-			break;
-		case 3:
-			HAPI->Close();
+			gameMenu.reset(new MainMenu(MenuState::getSoundManager()));
 			break;
 	}
 }
 
-bool MainMenu::setupAssets(){
+bool HowMenu::setupAssets(){
 	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_menuAssets.back()->Load("images/main_menu_bg.png", LOAD_IMAGE, "menu_background", _menuAssets.size() - 1)))
+	if(!(_menuAssets.back()->Load("images/select_menu_bg.png", LOAD_IMAGE, "menu_background", _menuAssets.size() - 1)))	//Borrow the select menu BG as it's pretty fitting for this menu.
 		return false;
 
 	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
@@ -124,6 +107,10 @@ bool MainMenu::setupAssets(){
 
 	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
 	if(!(_menuAssets.back()->Load("images/controller/facebutton_a.png", LOAD_IMAGE, "controller_a", _menuAssets.size() - 1)))
+		return false;
+	
+	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
+	if(!(_menuAssets.back()->Load("images/menu_help_control.png", LOAD_IMAGE, "help_controls", _menuAssets.size() - 1)))
 		return false;
 
 	return true;

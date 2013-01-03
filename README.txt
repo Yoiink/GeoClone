@@ -7,9 +7,43 @@
 //                                                                                      //
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
 //											//
-//		Music: Majority of music borrowed from Geometry Wars			//
-//			Music Created by: http://goo.gl/LwUWn				//
+//			~~~THIS GAME IS FOR DEMO PURPOSES ONLY~~~			//
+//		CREDIT GOES TO THESE PEOPLE FOR THE FOLLOWING CONTENT:			//
+//			Music: All from Geometry Wars Evolved 2				//
+//		Sounds: All from Geometry Wars Evolved apart from menu sound		//
+//		Art: Created by myself with ideas from Geometry Wars			//
+//											//
 //////////////////////////////////////////////////////////////////////////////////////////
+
+Update (FINAL ICA HAND IN) - 03/01/2013 (Happy New Year)
+
+New Functionality
+-----------------
+
+- Spawn cooldown
+- Updated How to Play
+
+Code Additions
+--------------
+
+- Added a further if check in the collision function to check if the player is colliding with an enemy
+  that is in cooldown.
+
+Tests
+-----
+
+- Just had to test if I could collide with an enemy that had just spawned which I can't.
+
+Notes
+-----
+Overall there is still a lot that I would have liked to add such as player lives and further tweaks to
+the game modes. I would have also liekd to add more enemy spawning waves but the general idea is there
+it's just getting the idea of more waves which would be easier if there were more enemies which is another
+thing I would liked to have added.
+
+The game is mostly all there now though and is playable.
+
+______________________________________________________________________________________________________
 
 Update - 31/12/2012
 
