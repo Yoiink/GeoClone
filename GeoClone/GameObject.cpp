@@ -124,6 +124,10 @@ GameObject::~GameObject(){
 		return _objectSide;
 	}
 
+	bool GameObject::getIsCooldown() const{
+		return false;
+	}
+
 
 #pragma endregion Get functions
 
@@ -252,6 +256,16 @@ bool GameObject::CheckCollision(std::shared_ptr<GameObject> &objectCheck){
 				//If both objects are the same side, there's no need to mark dead.
 				if( (getObjectSide() == objectCheck->getObjectSide()) )
 					return false;
+
+				//Check to see if we're checking an enemy against geo or visa-versa.
+				if( (getObjectType() == GEO && objectCheck->getObjectSide() == ENEMY) || 
+					(getObjectSide() == ENEMY && objectCheck->getObjectType() == GEO) ){
+						//Check if the enemy is in cooldown (just spawened)
+						if(getIsCooldown() || objectCheck->getIsCooldown()){
+							//We don't want to kill the player if it has just spawned.
+							return false;
+						}
+				}
 
 				objectCheck->setIsAlive(false);
 				setIsAlive(false);

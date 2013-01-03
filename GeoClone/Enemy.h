@@ -13,6 +13,8 @@ public:
 	void Chase(std::shared_ptr<GameObject> &player, const float &deltaTime);
 	int getEnemyID() const;
 
+	bool getIsCooldown() const;
+
 private:
 	int _enemyID;
 	float _spawnCooldown;

@@ -34,8 +34,11 @@ SoundManager::~SoundManager(void)
 void SoundManager::playAudio(int audioID){
 
 	if(audioID == MAIN_MENU_MUSIC || audioID == EVOLVED_MUSIC || audioID == DEADLINE_MUSIC){
-		_musicChannel->setVolume(1);
-		_system->playSound(FMOD_CHANNEL_FREE, _sounds.at(audioID), false, &_musicChannel);
+		bool isPlaying = false;
+		if(_musicChannel->isPlaying(&isPlaying)){
+			_musicChannel->setVolume(1);
+			_system->playSound(FMOD_CHANNEL_FREE, _sounds.at(audioID), false, &_musicChannel);
+		}
 	} else {
 		_soundChannel->setVolume(0.5);
 		_system->playSound(FMOD_CHANNEL_FREE, _sounds.at(audioID), false, &_soundChannel);

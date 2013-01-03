@@ -4,7 +4,7 @@
 #include <memory>
 //#include "Asset.h"
 
-enum ObjectID{GEO, BULLET};
+enum ObjectID{GEO, BULLET}; //Continue in Enemy.h
 enum ObjectSide{ALLY, NEUTRAL, ENEMY};
 
 class GameObject{
@@ -36,6 +36,7 @@ public:
 	int getDeathAssetID() const;
 	float getRadiusPowTwo() const;
 	int getObjectSide() const;
+	virtual bool getIsCooldown() const;
 
 	//Set
 	virtual bool setWidth(const int width);

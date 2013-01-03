@@ -9,7 +9,7 @@ Enemy::Enemy(int width, int height, float posX, float posY, float speed, int ene
 		setTexture(assetID);
 		setDeathTexture(deathAssetID);
 
-		_spawnCooldown = 0;	//Disabled at the moment. Usually: 1000 = 1 second.
+		_spawnCooldown = 500;	//In milliseconds (150 to 300 is average human reaction time)
 }
 
 
@@ -21,12 +21,20 @@ int Enemy::getEnemyID() const{
 	return _enemyID;
 }
 
+bool Enemy::getIsCooldown() const{
+	if(_spawnCooldown <= 0)
+		return false;
+
+	return true;
+}
+
+
 
 void Enemy::Chase(std::shared_ptr<GameObject> &player, const float &deltaTime){
 
 	if(_spawnCooldown > 0){
 		_spawnCooldown -= deltaTime * 10;
-		return;
+		//return;
 	}
 
 	//AI "Chase" code/idea from: http://www.peachpit.com/articles/article.aspx?p=102090&seqNum=4

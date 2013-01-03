@@ -40,7 +40,7 @@ World::~World(void)
 }
 
 void World::restartWorld(){
-	_gameMode.reset(new EvolvedGame);
+	//_gameMode.reset(new EvolvedGame);
 
 	if(!_entityList.empty()){
 		_entityList.clear();

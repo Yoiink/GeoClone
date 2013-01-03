@@ -12,7 +12,7 @@ MainMenu::MainMenu(std::shared_ptr<SoundManager> &soundManager) :
 	MenuState(soundManager)
 {
 	//Spaces to align text, may be quicker than calculating their positions...
-	_menuItems.push_back("Play Evolved");
+	_menuItems.push_back("       Play");
 	_menuItems.push_back("    Options");
 	_menuItems.push_back(" How to Play");
 	_menuItems.push_back("  Exit Game");
@@ -90,23 +90,14 @@ void MainMenu::changeItem(int change){
 void MainMenu::selectedItem(bool &inMenues, std::shared_ptr<MenuState> &gameMenu, std::shared_ptr<World> gameWorld){
 	switch(_selectedItem){
 		case 0:
-			////_gameMode.reset(new EvolvedGame());
-			//MenuState::getSoundManager()->stopMusic();
-			////gameWorld->loadMode(EVOLVED_GAME);
-			//gameWorld->loadMode(DEADLINE_GAME);
-			//if(!gameWorld->setupWorld()){
-			//	HAPI->Close();
-			//	return;
-			//}
-			//inMenues = false;
-			//break;
 			gameMenu.reset(new SelectMenu(MenuState::getSoundManager()));
 			break;
 		case 1:
-			//MenuState::getSoundManager()->stopMusic();
 			gameMenu.reset(new OptionsMenu(MenuState::getSoundManager()));
 			break;
 		case 2:
+			break;
+		case 3:
 			HAPI->Close();
 			break;
 	}
