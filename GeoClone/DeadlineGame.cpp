@@ -6,8 +6,7 @@
 
 
 DeadlineGame::DeadlineGame(void) : _spawnMode(0), _timeLastSpawn(0), _spawnComplete(true), _spawnWave(0), _spawnCooldown(3000), _gameScore(0),
-	_gameTimer(180), _timeCheck(0), _lastTick(0), _bgPosX(-1024), _bgPosY(-530), _highscoreFile("deadlineScore")
-{
+	_gameTimer(180), _timeCheck(0), _lastTick(0), _bgPosX(-1024), _bgPosY(-530), _highscoreFile("deadlineScore"){
 }
 
 
@@ -83,6 +82,33 @@ std::shared_ptr<Asset> DeadlineGame::getAsset(int assetID) const{
 
 void DeadlineGame::resetScore(){
 	_gameScore = 0;
+}
+
+bool DeadlineGame::isGameOver(std::list<std::shared_ptr<GameObject>> &entityList){
+
+	if(_gameTimer > 0){
+
+		//Remove all enemies
+		entityList.remove_if([&](std::shared_ptr<GameObject> entity) -> bool{
+				if(entity->getObjectSide() == ENEMY){
+					return true;
+				} else {
+					return false;
+				}
+			}
+		);
+
+		//Reset the spawn wave
+		_spawnComplete = true;
+
+		//Set spawn cooldown to two seconds to allow player timen to recover.
+		_spawnCooldown = HAPI->GetTime() + 2000;
+
+		return false;
+
+	} else {
+		return true;
+	}
 }
 
 //Change this to a bool? If there's a problem we're still setting the ID.

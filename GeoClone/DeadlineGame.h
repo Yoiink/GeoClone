@@ -21,8 +21,10 @@ public:
 	unsigned long int getHighscore() const;
 	std::string getHighscoreFile() const;
 
+	bool isGameOver(std::list<std::shared_ptr<GameObject>> &entityList);
 	bool renderHUD(Draw &screen) const;
 	void resetScore();
+
 
 	//Set
 	bool addScore(int entityID);

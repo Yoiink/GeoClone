@@ -23,6 +23,7 @@ public:
 
 	bool renderHUD(Draw &screen) const;
 	void resetScore();
+	bool isGameOver(std::list<std::shared_ptr<GameObject>> &entityList);
 
 	//Set
 	bool addScore(int entityID);
@@ -32,7 +33,7 @@ public:
 private:
 	std::vector<std::shared_ptr<Asset>> _gameAssets;
 
-	int _spawnMode, _timeLastSpawn, _currentTime, _spawnWave, _spawnCooldown, _bgPosX, _bgPosY;
+	int _spawnMode, _timeLastSpawn, _currentTime, _spawnWave, _spawnCooldown, _bgPosX, _bgPosY, _livesLeft;
 	std::string _highscoreFile;
 	unsigned long int _gameScore;	//Still a limit of 4,294,967,295
 	bool _spawnComplete;

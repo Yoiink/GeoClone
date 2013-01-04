@@ -506,10 +506,17 @@ void World::update(){
 
 		//Check if player has died, if they have, write to the highscore file and create the game over menu.
 		if(!_Geo->getAlive()){
-			_inMenues = true;
-			writeHighscore(_gameMode->getHighscore(), _gameMode->getHighscoreFile());
-			_gameMenu.reset(new GameOverMenu(_soundManager));
-			_gameMenu->setHighscore(readHighscore(_gameMode->getHighscoreFile()));
+
+			//Check with the game mode to see if the game should be over.
+			if(!_gameMode->isGameOver(_entityList)){
+				_Geo->setIsAlive(true);
+			} else {
+				//Game mode also says game over so create menu.
+				_inMenues = true;
+				writeHighscore(_gameMode->getHighscore(), _gameMode->getHighscoreFile());
+				_gameMenu.reset(new GameOverMenu(_soundManager));
+				_gameMenu->setHighscore(readHighscore(_gameMode->getHighscoreFile()));
+			}
 		}
 
 		//Remove any entity that has gone out of bounds or is marked as dead (getAlive())

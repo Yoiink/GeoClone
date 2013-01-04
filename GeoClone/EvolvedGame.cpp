@@ -6,7 +6,7 @@
 
 
 EvolvedGame::EvolvedGame(void) : _spawnMode(0), _timeLastSpawn(0), _spawnComplete(true), _spawnWave(0), _spawnCooldown(3000),
-	_gameScore(0), _bgPosX(-1024), _bgPosY(-530), _highscoreFile("evolvedScore")
+	_gameScore(0), _bgPosX(-1024), _bgPosY(-530), _highscoreFile("evolvedScore"), _livesLeft(3)
 {
 }
 
@@ -103,14 +103,39 @@ std::string EvolvedGame::getHighscoreFile() const{
 	return _highscoreFile;
 }
 
+bool EvolvedGame::isGameOver(std::list<std::shared_ptr<GameObject>> &entityList){
+	if(_livesLeft > 0){
+		_livesLeft--;
+
+		//Remove all enemies
+		entityList.remove_if([&](std::shared_ptr<GameObject> entity) -> bool{
+				if(entity->getObjectSide() == ENEMY){
+					return true;
+				} else {
+					return false;
+				}
+			}
+		);
+
+		//Reset the spawn wave
+		_spawnComplete = true;
+
+		//Set spawn cooldown to two seconds to allow player timen to recover.
+		_spawnCooldown = HAPI->GetTime() + 2000;
+
+		return false;
+	}
+	return true;
+}
+
 void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList, std::shared_ptr<Draw> &screen, std::shared_ptr<GameObject> &Geo, std::shared_ptr<SoundManager> &sound){
 
 	_currentTime = HAPI->GetTime();
 
 	if(_spawnCooldown < _currentTime){
 		if(_spawnComplete){
-			_spawnMode = rand() % 5;
-			//_spawnMode = -2;
+			//_spawnMode = rand() % 5;
+			_spawnMode = -2;
 			_spawnComplete = false;
 			_timeLastSpawn = _currentTime;
 		}
@@ -121,39 +146,39 @@ void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList,
 		float playRight = screen->getGridX() + screen->getWidth() - 40;
 		float playBottom = screen->getGridY() + screen->getHeight() - 40;
 
-		//if(_spawnMode == -2){
-		//	int maxEnemies = 16;
-		//	
-		//	for(int enemyCount = 0; enemyCount < maxEnemies; enemyCount++){
-		//		float angle = (enemyCount * (360.0f / maxEnemies));
-		//		float xAdd = 1*cos(angle);
-		//		float yAdd = 1*sin(angle);
-		//		int spawnDistance = 300;
+		if(_spawnMode == -2){
+			int maxEnemies = 16;
+			
+			for(int enemyCount = 0; enemyCount < maxEnemies; enemyCount++){
+				float angle = (enemyCount * (360.0f / maxEnemies));
+				float xAdd = 1*cos(angle);
+				float yAdd = 1*sin(angle);
+				int spawnDistance = 300;
 
-		//		float calcSpawnX = Geo->getX() + (xAdd * spawnDistance);
-		//		float calcSpawnY = Geo->getY() + (yAdd * spawnDistance);
+				float calcSpawnX = Geo->getX() + (xAdd * spawnDistance);
+				float calcSpawnY = Geo->getY() + (yAdd * spawnDistance);
 
-		//		if(calcSpawnX < playLeft)
-		//			calcSpawnX = playLeft + 10;
-		//		
+				if(calcSpawnX < playLeft)
+					calcSpawnX = playLeft + 10;
+				
 
-		//		if(calcSpawnY < playTop)
-		//			calcSpawnY = playTop + 10;
-		//		
+				if(calcSpawnY < playTop)
+					calcSpawnY = playTop + 10;
+				
 
-		//		if(calcSpawnX > playRight)
-		//			calcSpawnX = playRight - 40;
+				if(calcSpawnX > playRight)
+					calcSpawnX = playRight - 40;
 
-		//		if(calcSpawnY > playBottom)
-		//			calcSpawnY = playBottom - 40;
+				if(calcSpawnY > playBottom)
+					calcSpawnY = playBottom - 40;
 
-		//		entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(calcSpawnX, calcSpawnY, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-		//		sound->playAudio(PURPLE_SPAWN);
+				entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(calcSpawnX, calcSpawnY, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+				sound->playAudio(PURPLE_SPAWN);
 
-		//		_spawnCooldown = _currentTime + 1000;
+				_spawnCooldown = _currentTime + 1000;
 
-		//	}
-		//}
+			}
+		}
 
 		if(_spawnMode <= 3){ //NORMAL SPAWN
 			if(_timeLastSpawn <= _currentTime){
@@ -249,6 +274,10 @@ bool EvolvedGame::renderHUD(Draw &screen) const{
 		currentScoreStr.insert(currentScoreStr.length() - commaIndex, ",");
 	}
 
+	//Display lives left
+	HAPI->RenderText(screen.getWidth() - 200, 40, HAPI_TColour(0, 255, 0), "Lives: " + std::to_string(_livesLeft));
+
+	//Display score
 	HAPI->RenderText(screen.getWidth() / screen.getScreenBoundry() + 30, 40, HAPI_TColour(0, 255, 0), currentScoreStr);
 	HAPI->ChangeFont("Tahoma", 24, 100);
 	return true;

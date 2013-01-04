@@ -22,6 +22,8 @@ public:
 	virtual unsigned long int getHighscore() const = 0;
 	virtual std::string getHighscoreFile() const = 0;
 
+
+	virtual bool isGameOver(std::list<std::shared_ptr<GameObject>> &entityList) = 0;
 	virtual void resetScore() = 0;
 	virtual bool addScore(int entityID) = 0;
 	virtual bool renderHUD(Draw &screen) const = 0;
