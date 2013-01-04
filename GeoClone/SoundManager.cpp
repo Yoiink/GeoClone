@@ -11,6 +11,7 @@ SoundManager::SoundManager(void)
 	_sounds.push_back(loadSound("sounds/evolved.mp3", true));
 	_sounds.push_back(loadSound("sounds/main_menu_music.ogg", true));
 	_sounds.push_back(loadSound("sounds/deadline.ogg", true));
+	_sounds.push_back(loadSound("sounds/waves.ogg", true));
 	_sounds.push_back(loadSound("sounds/menu_nav_sound.mp3"));
 	_sounds.push_back(loadSound("sounds/fire_normal.wav"));
 	_sounds.push_back(loadSound("sounds/enemy_explode.ogg"));
@@ -34,7 +35,7 @@ SoundManager::~SoundManager(void)
 
 void SoundManager::playAudio(int audioID){
 
-	if(audioID == MAIN_MENU_MUSIC || audioID == EVOLVED_MUSIC || audioID == DEADLINE_MUSIC){
+	if(audioID == MAIN_MENU_MUSIC || audioID == EVOLVED_MUSIC || audioID == DEADLINE_MUSIC || audioID == WAVES_MUSIC){
 		bool isPlaying = false;
 		if(_musicChannel->isPlaying(&isPlaying)){
 			_musicChannel->setVolume(1);
@@ -50,7 +51,11 @@ FMOD::Sound*  SoundManager::loadSound(std::string assetName, bool isMusic){
 
 	FMOD::Sound* loadSound = new FMOD::Sound(*loadSound);
 	FMOD_RESULT result;
-	result = _system->createSound(assetName.c_str(), FMOD_HARDWARE, 0, &loadSound);
+	if(isMusic){
+		result = _system->createSound(assetName.c_str(), FMOD_LOOP_NORMAL | FMOD_CREATESTREAM, 0, &loadSound);
+	} else {
+		result = _system->createSound(assetName.c_str(), FMOD_HARDWARE, 0, &loadSound);
+	}
 	
 	if(result != FMOD_OK){
 		HAPI->UserMessage("Unable to load file " + assetName + ". GeoClone will now close.", "Unable to load sound", eButtonTypeOk);

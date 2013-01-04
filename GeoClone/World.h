@@ -13,7 +13,7 @@ class ParticleEmitter;
 class MenuState;
 class SoundManager;
 
-enum GameMode{EVOLVED_GAME, DEADLINE_GAME};
+enum GameMode{EVOLVED_GAME, DEADLINE_GAME, WAVES_GAME};
 
 class World : public std::enable_shared_from_this<World>	//Allows the use of shared_from_this() to replace the "this" pointer as a shared_ptr
 {

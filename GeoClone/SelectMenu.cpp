@@ -13,7 +13,7 @@ SelectMenu::SelectMenu(std::shared_ptr<SoundManager> &soundManager) :
 	//Spaces to align text, may be quicker than calculating their positions...
 	_menuItems.push_back("     Evolved");
 	_menuItems.push_back("   Deadline");
-	_menuItems.push_back("Not Available");
+	_menuItems.push_back("      Waves");
 	_menuItems.push_back("Not Available");
 	_startX = 0;
 	_startY = 0;
@@ -116,7 +116,13 @@ void SelectMenu::selectedItem(bool &inMenues, std::shared_ptr<MenuState> &gameMe
 			inMenues = false;
 			break;
 		case 2:
-			//HAPI->Close();
+			MenuState::getSoundManager()->stopMusic();
+			gameWorld->loadMode(WAVES_GAME);
+			if(!gameWorld->setupWorld()){
+				HAPI->Close();
+				return;
+			}
+			inMenues = false;
 			break;
 		case 3:
 			//HAPI->Close();

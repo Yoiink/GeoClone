@@ -15,6 +15,7 @@
 //Game Modes
 #include "EvolvedGame.h"
 #include "DeadlineGame.h"
+#include "WavesGame.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -60,6 +61,9 @@ void World::loadMode(int gameID){
 	} else if(gameID == DEADLINE_GAME){
 		_soundManager->playAudio(DEADLINE_MUSIC);
 		_gameMode.reset(new DeadlineGame);
+	} else if(gameID == WAVES_GAME){
+		_soundManager->playAudio(WAVES_MUSIC);
+		_gameMode.reset(new WavesGame);
 	}
 
 	_render->changeStatePtr(_gameMode);
