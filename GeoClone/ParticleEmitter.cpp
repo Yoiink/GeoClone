@@ -73,7 +73,7 @@ std::shared_ptr<GameObject> ParticleEmitter::getParticle(int index){
 }
 
 int ParticleEmitter::getAmountParticles(){
-	return _particles.size();
+	return static_cast<int>(_particles.size());
 }
 
 bool ParticleEmitter::getAlive(){

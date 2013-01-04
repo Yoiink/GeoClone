@@ -17,60 +17,60 @@ DeadlineGame::~DeadlineGame(void)
 bool DeadlineGame::loadAssets(){
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/bullet.png", LOAD_IMAGE, "bullet", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/bullet.png", LOAD_IMAGE, "bullet", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/particle_purple.png", LOAD_IMAGE, "particle_purple", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/particle_purple.png", LOAD_IMAGE, "particle_purple", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/particle_blue.png", LOAD_IMAGE, "particle_blue", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/particle_blue.png", LOAD_IMAGE, "particle_blue", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/particle_green.png", LOAD_IMAGE, "particle_green", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/particle_green.png", LOAD_IMAGE, "particle_green", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/particle_trail.png", LOAD_IMAGE, "particle_trail", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/particle_trail.png", LOAD_IMAGE, "particle_trail", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 	if(!_gameAssets.back()->loadAnimation(32, 4, 4))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/particle_bullet.png", LOAD_IMAGE, "particle_bullet", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/particle_bullet.png", LOAD_IMAGE, "particle_bullet", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/particle_geodeath.png", LOAD_IMAGE, "particle_geodeath", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/particle_geodeath.png", LOAD_IMAGE, "particle_geodeath", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/Geo.png", LOAD_IMAGE, "geo", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/Geo.png", LOAD_IMAGE, "geo", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
-	//if(!(_gameAssets.back()->Load("GeoAnimate.png", LOAD_IMAGE, "geo", _gameAssets.size() - 1)))
+	//if(!(_gameAssets.back()->Load("GeoAnimate.png", LOAD_IMAGE, "geo", static_cast<int>(_gameAssets.size() - 1))))
 	//	return false;
 
 	//if(!_gameAssets.back()->loadAnimation(6, 32, 32))
 	//	return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/enemy_purple.png", LOAD_IMAGE, "enemy_purple", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/enemy_purple.png", LOAD_IMAGE, "enemy_purple", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/enemy_purple_mini.png", LOAD_IMAGE, "enemy_purple_mini", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/enemy_purple_mini.png", LOAD_IMAGE, "enemy_purple_mini", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/enemy_blue.png", LOAD_IMAGE, "enemy_blue", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/enemy_blue.png", LOAD_IMAGE, "enemy_blue", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_gameAssets.back()->Load("images/bg_parallax.png", LOAD_IMAGE, "enemy_purple", _gameAssets.size() - 1)))
+	if(!(_gameAssets.back()->Load("images/bg_parallax.png", LOAD_IMAGE, "enemy_purple", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 
 	return true;

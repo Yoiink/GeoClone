@@ -48,14 +48,14 @@ void SelectMenu::update(std::shared_ptr<Draw> &renderer){
 	int yModifier = 0;
 	for(size_t curItem = 0; curItem < _menuItems.size(); curItem++){
 		if(curItem == _selectedItem){
-			HAPI->RenderText(_startX + xModifier, _startY + ((curItem / 2) * 220), HAPI_TColour(180, 255, 0), _menuItems[curItem]);
+			HAPI->RenderText(_startX + xModifier, _startY + ((static_cast<int>(curItem) / 2) * 220), HAPI_TColour(180, 255, 0), _menuItems[curItem]);
 			renderer->Render(_startX + xModifier - (_menuAssets[1]->getWidth() / 2) + 80.f, 
-							_startY + ((curItem / 2) * 220) - (_menuAssets[1]->getHeight() / 2) + 18.f,
+							_startY + ((static_cast<int>(curItem)  / 2) * 220) - (_menuAssets[1]->getHeight() / 2) + 18.f,
 							_menuAssets[1]->getWidth(), _menuAssets[1]->getHeight(), _menuAssets[1]->getTexture());
 		} else {
-			HAPI->RenderText(_startX + xModifier, _startY + ((curItem / 2) * 220), HAPI_TColour(0, 255, 0), _menuItems[curItem]);
+			HAPI->RenderText(_startX + xModifier, _startY + ((static_cast<int>(curItem)  / 2) * 220), HAPI_TColour(0, 255, 0), _menuItems[curItem]);
 			renderer->Render(_startX + xModifier - (_menuAssets[2]->getWidth() / 2) + 80.f, 
-							_startY + ((curItem / 2) * 220) - (_menuAssets[2]->getHeight() / 2) + 18.f,
+							_startY + ((static_cast<int>(curItem)  / 2) * 220) - (_menuAssets[2]->getHeight() / 2) + 18.f,
 							_menuAssets[2]->getWidth(), _menuAssets[2]->getHeight(), _menuAssets[2]->getTexture());
 		}
 		
@@ -86,7 +86,7 @@ void SelectMenu::changeItem(int change){
 	_selectedItem += change;
 
 	if(_selectedItem < 0)
-		_selectedItem =  _menuItems.size() - 1;
+		_selectedItem =  static_cast<int>(_menuItems.size() - 1);
 
 	if(static_cast<size_t>(_selectedItem) > _menuItems.size() - 1){
 		_selectedItem = 0;
@@ -132,27 +132,27 @@ void SelectMenu::selectedItem(bool &inMenues, std::shared_ptr<MenuState> &gameMe
 
 bool SelectMenu::setupAssets(){
 	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_menuAssets.back()->Load("images/select_menu_bg.png", LOAD_IMAGE, "menu_background", _menuAssets.size() - 1)))
+	if(!(_menuAssets.back()->Load("images/select_menu_bg.png", LOAD_IMAGE, "menu_background", static_cast<int>(_menuAssets.size() - 1))))
 		return false;
 
 	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_menuAssets.back()->Load("images/select_menu_active.png", LOAD_IMAGE, "menu_active", _menuAssets.size() - 1)))
+	if(!(_menuAssets.back()->Load("images/select_menu_active.png", LOAD_IMAGE, "menu_active", static_cast<int>(_menuAssets.size() - 1))))
 		return false;
 
 	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_menuAssets.back()->Load("images/select_menu_nonactive.png", LOAD_IMAGE, "menu_nonactive", _menuAssets.size() - 1)))
+	if(!(_menuAssets.back()->Load("images/select_menu_nonactive.png", LOAD_IMAGE, "menu_nonactive", static_cast<int>(_menuAssets.size() - 1))))
 		return false;
 
 	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_menuAssets.back()->Load("images/nav_updown.png", LOAD_IMAGE, "nav_updown", _menuAssets.size() - 1)))
+	if(!(_menuAssets.back()->Load("images/nav_updown.png", LOAD_IMAGE, "nav_updown", static_cast<int>(_menuAssets.size() - 1))))
 		return false;
 
 	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_menuAssets.back()->Load("images/nav_leftright.png", LOAD_IMAGE, "nav_leftright", _menuAssets.size() - 1)))
+	if(!(_menuAssets.back()->Load("images/nav_leftright.png", LOAD_IMAGE, "nav_leftright", static_cast<int>(_menuAssets.size() - 1))))
 		return false;
 
 	_menuAssets.push_back(std::shared_ptr<Asset>(new Asset()));
-	if(!(_menuAssets.back()->Load("images/controller/facebutton_a.png", LOAD_IMAGE, "controller_a", _menuAssets.size() - 1)))
+	if(!(_menuAssets.back()->Load("images/controller/facebutton_a.png", LOAD_IMAGE, "controller_a", static_cast<int>(_menuAssets.size() - 1))))
 		return false;
 
 	return true;
