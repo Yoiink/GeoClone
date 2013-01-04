@@ -146,14 +146,17 @@ void WavesGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList, s
 		float playRight = screen->getGridX() + screen->getWidth() - 40;
 		float playBottom = screen->getGridY() + screen->getHeight() - 40;
 
+		HAPI->RenderText(0, 300, HAPI_TColour(), std::to_string(playLeft));
+
+
 		if(!_spawnComplete){ //Spawn orange from wall
-			int enemiesToSpawn = 10;
+			int enemiesToSpawn = 14;
 			int wallSelect = rand() % 4;
 			float enemyOffset = 0;
 
 			switch(wallSelect){
 			case 0: //LEFT WALL
-				enemyOffset = ((playTop + 20) + (playBottom - 20)) / enemiesToSpawn;
+				enemyOffset = screen->getHeight() / enemiesToSpawn;
 				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
 						entityList.push_front(std::shared_ptr<Enemy>(new EnemyOrange(playLeft, playTop + (enemyCounter * enemyOffset), getAssetID("enemy_orange"), getAssetID("particle_orange"))));
 						entityList.front()->setDirectionX(1);
@@ -161,7 +164,7 @@ void WavesGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList, s
 				sound->playAudio(ORANGE_SPAWN);
 				break;
 			case 1: //RIGHT WALL
-				enemyOffset = ((playTop + 20) + (playBottom - 20)) / enemiesToSpawn;
+				enemyOffset = screen->getHeight() / enemiesToSpawn;
 				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
 					//Random between blue spawn/purple spawn
 						entityList.push_front(std::shared_ptr<Enemy>(new EnemyOrange(playRight, playTop + (enemyCounter * enemyOffset), getAssetID("enemy_orange"), getAssetID("particle_orange"))));
@@ -170,16 +173,16 @@ void WavesGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList, s
 				sound->playAudio(ORANGE_SPAWN);
 				break;
 			case 2: //TOP WALL
-				enemyOffset = ((playLeft + 20) + (playRight - 20)) / enemiesToSpawn;
-				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+				enemyOffset = screen->getWidth() / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn + 4; enemyCounter++){
 						entityList.push_front(std::shared_ptr<Enemy>(new EnemyOrange(playLeft + (enemyCounter * enemyOffset), playTop, getAssetID("enemy_orange"), getAssetID("particle_orange"))));
 						entityList.front()->setDirectionY(1);
 				}
 				sound->playAudio(ORANGE_SPAWN);
 				break;
 			case 3: //BOTTOM WALL
-				enemyOffset = ((playLeft + 20) + (playRight - 20)) / enemiesToSpawn;
-				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+				enemyOffset = screen->getWidth() / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn + 4; enemyCounter++){
 						entityList.push_front(std::shared_ptr<Enemy>(new EnemyOrange(playLeft + (enemyCounter * enemyOffset), playBottom, getAssetID("enemy_orange"), getAssetID("particle_orange"))));
 						entityList.front()->setDirectionY(-1);
 				}

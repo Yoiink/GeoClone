@@ -15,7 +15,7 @@ void ControlInput::updateControllers(){
 
 	//Check to see if the Xbox controller is plugged in or not.
 	if(usingXboxController){
-		if(!HAPI->GetControllerData(0, &controllerData)){ //Check controller data, if false, run if statement. Plan on triggering the "Pause" screen when it's set up.
+		if(!HAPI->GetControllerData(0, &controllerData)){ //Check controller data, if false, run if statement.
 			HAPI_UserResponse keepController;
 			HAPI->UserMessage("You have unplugged your controller. Would you like to continue using a controller?", "Controller Unplugged!", eButtonTypeYesNo, &keepController);
 			if(keepController == eUserResponseYes){
@@ -24,6 +24,7 @@ void ControlInput::updateControllers(){
 					HAPI->UserMessage("Still can't detect your controller. Try again?", "Controller Unplugged!", eButtonTypeYesNo, &keepChecking);
 					if(keepChecking = eUserResponseNo){
 						usingXboxController = false;
+						break;
 					}
 				}
 			} else {

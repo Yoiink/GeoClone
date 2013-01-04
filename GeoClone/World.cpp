@@ -33,6 +33,7 @@ World::World(int screenWidth, int screenHeight) :  _gameMode(NULL), _render(new 
 	_deltaTime = 0;
 	_movementInput = false;
 	_inMenues = true;
+	_graphicsToggle = true;
 }
 
 
@@ -558,7 +559,7 @@ void World::update(){
 		_gameMode->renderHUD(*_render);
 
 		//HAPI->DebugText("Num Entities: " + std::to_string(_entityList.size()));
-		HAPI->RenderText(0, 30, HAPI_TColour(), "dT: " + std::to_string(_deltaTime));
+		//HAPI->RenderText(0, 30, HAPI_TColour(), "dT: " + std::to_string(_deltaTime));
 
 	}
 

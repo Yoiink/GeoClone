@@ -34,7 +34,7 @@ void Player::Update(const float &deltaTime){
 
 	if(_immunityTimer > 0){
 		_immunityTimer -= deltaTime * 10;
-		HAPI->RenderText(0, 60, HAPI_TColour(), std::to_string(_immunityTimer));
+		//HAPI->RenderText(0, 60, HAPI_TColour(), std::to_string(_immunityTimer));
 	}
 
 	if(_lastFrame + 2000 < HAPI->GetTime()){
