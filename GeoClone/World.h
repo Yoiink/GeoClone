@@ -33,8 +33,8 @@ public:
 	bool getGraphicsSettings();
 	void setGraphicsSettings(bool highGraphics);
 
-	std::vector<std::string> readHighscore();
-	void writeHighscore(unsigned long int score);
+	std::vector<std::string> readHighscore(std::string fileName);
+	void writeHighscore(unsigned long int score, std::string fileName);
 
 
 private:

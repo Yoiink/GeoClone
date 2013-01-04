@@ -1,5 +1,5 @@
 #include "SoundManager.h"
-
+#include <HAPI_lib.h>
 
 SoundManager::SoundManager(void)
 {
@@ -48,8 +48,13 @@ void SoundManager::playAudio(int audioID){
 FMOD::Sound*  SoundManager::loadSound(std::string assetName, bool isMusic){
 
 	FMOD::Sound* loadSound = new FMOD::Sound(*loadSound);
-
-	_system->createSound(assetName.c_str(), FMOD_HARDWARE, 0, &loadSound);
+	FMOD_RESULT result;
+	result = _system->createSound(assetName.c_str(), FMOD_HARDWARE, 0, &loadSound);
+	
+	if(result != FMOD_OK){
+		HAPI->UserMessage("Unable to load file " + assetName + ". GeoClone will now close.", "Unable to load sound", eButtonTypeOk);
+		HAPI->Close();
+	}
 
 	return loadSound;
 }

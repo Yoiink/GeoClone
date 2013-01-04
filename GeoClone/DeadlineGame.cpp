@@ -5,7 +5,8 @@
 #include "SoundManager.h"
 
 
-DeadlineGame::DeadlineGame(void) : _spawnMode(0), _timeLastSpawn(0), _spawnComplete(true), _spawnWave(0), _spawnCooldown(3000), _gameScore(0), _gameTimer(180), _timeCheck(0), _lastTick(0), _bgPosX(-1024), _bgPosY(-530)
+DeadlineGame::DeadlineGame(void) : _spawnMode(0), _timeLastSpawn(0), _spawnComplete(true), _spawnWave(0), _spawnCooldown(3000), _gameScore(0),
+	_gameTimer(180), _timeCheck(0), _lastTick(0), _bgPosX(-1024), _bgPosY(-530), _highscoreFile("deadlineScore")
 {
 }
 
@@ -96,6 +97,10 @@ int DeadlineGame::getAssetID(std::string assetName) const{
 
 unsigned long int DeadlineGame::getHighscore() const{
 	return _gameScore;
+}
+
+std::string DeadlineGame::getHighscoreFile() const{
+	return _highscoreFile;
 }
 
 void DeadlineGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList, std::shared_ptr<Draw> &screen, std::shared_ptr<GameObject> &Geo, std::shared_ptr<SoundManager> &sound){

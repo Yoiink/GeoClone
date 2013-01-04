@@ -11,7 +11,8 @@
 //		CREDIT GOES TO THESE PEOPLE FOR THE FOLLOWING CONTENT:			//
 //			Music: All from Geometry Wars Evolved 2				//
 //		Sounds: All from Geometry Wars Evolved apart from menu sound		//
-//		Art: Created by myself with ideas from Geometry Wars			//
+//		Art: Created by myself with ideas from Geometry Wars apart from...	//
+//			Controller Art: http://goo.gl/sO8mJ				//
 //											//
 //////////////////////////////////////////////////////////////////////////////////////////
 

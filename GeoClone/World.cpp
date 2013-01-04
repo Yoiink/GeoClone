@@ -87,13 +87,13 @@ void World::setGraphicsSettings(bool highGraphics){
 }
 
 
-std::vector<std::string> World::readHighscore(){
+std::vector<std::string> World::readHighscore(std::string fileName){
 	std::ifstream inScoreFile;
 	std::vector<std::string> fileLines;
 	std::string currentLine;
 
 	//Open file, read data into string vector
-	inScoreFile.open("highscore.txt", std::ios::out);
+	inScoreFile.open(fileName + ".txt", std::ios::out);
 	if(inScoreFile.is_open()){
 		while(!inScoreFile.eof() && fileLines.size() < 5){ //Only want to display top 5 highscores.
 			std::getline(inScoreFile, currentLine);
@@ -112,7 +112,7 @@ std::vector<std::string> World::readHighscore(){
 
 }
 
-void World::writeHighscore(unsigned long int score){
+void World::writeHighscore(unsigned long int score, std::string fileName){
 	std::ifstream inScoreFile;
 	std::ofstream outScoreFile;
 	std::vector<std::string> fileLines;
@@ -120,7 +120,7 @@ void World::writeHighscore(unsigned long int score){
 	bool scoreAdded = false;
 
 	//Open file, read data into string vector
-	inScoreFile.open("highscore.txt", std::ios::out);
+	inScoreFile.open(fileName + ".txt", std::ios::out);
 	if(inScoreFile.is_open()){
 		while(!inScoreFile.eof()){
 			std::getline(inScoreFile, currentLine);
@@ -148,7 +148,7 @@ void World::writeHighscore(unsigned long int score){
 	}
 
 	//Now use the string vector to write the fata out again
-	outScoreFile.open("highscore.txt", std::ios::out | std::ios::trunc);
+	outScoreFile.open(fileName + ".txt", std::ios::out | std::ios::trunc);
 	if(outScoreFile.is_open()){
 		for(std::string line : fileLines){
 			outScoreFile << line << "\n";
@@ -507,9 +507,9 @@ void World::update(){
 		//Check if player has died, if they have, write to the highscore file and create the game over menu.
 		if(!_Geo->getAlive()){
 			_inMenues = true;
-			writeHighscore(_gameMode->getHighscore());
+			writeHighscore(_gameMode->getHighscore(), _gameMode->getHighscoreFile());
 			_gameMenu.reset(new GameOverMenu(_soundManager));
-			_gameMenu->setHighscore(readHighscore());
+			_gameMenu->setHighscore(readHighscore(_gameMode->getHighscoreFile()));
 		}
 
 		//Remove any entity that has gone out of bounds or is marked as dead (getAlive())

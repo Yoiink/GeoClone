@@ -5,7 +5,8 @@
 #include "SoundManager.h"
 
 
-EvolvedGame::EvolvedGame(void) : _spawnMode(0), _timeLastSpawn(0), _spawnComplete(true), _spawnWave(0), _spawnCooldown(3000), _gameScore(0), _bgPosX(-1024), _bgPosY(-530)
+EvolvedGame::EvolvedGame(void) : _spawnMode(0), _timeLastSpawn(0), _spawnComplete(true), _spawnWave(0), _spawnCooldown(3000),
+	_gameScore(0), _bgPosX(-1024), _bgPosY(-530), _highscoreFile("evolvedScore")
 {
 }
 
@@ -96,6 +97,10 @@ int EvolvedGame::getAssetID(std::string assetName) const{
 
 unsigned long int EvolvedGame::getHighscore() const{
 	return _gameScore;
+}
+
+std::string EvolvedGame::getHighscoreFile() const{
+	return _highscoreFile;
 }
 
 void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList, std::shared_ptr<Draw> &screen, std::shared_ptr<GameObject> &Geo, std::shared_ptr<SoundManager> &sound){
