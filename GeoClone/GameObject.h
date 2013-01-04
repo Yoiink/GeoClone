@@ -61,7 +61,7 @@ public:
 	//virtual void Rotate(const double angle, int &posX, int &posY, const int midX, const int midY);
 	//virtual void Render(Draw &screen);
 	virtual void Update(const float &deltaTime);
-	virtual void Chase(std::shared_ptr<GameObject> &object, const float &deltaTime);
+	virtual void Chase(std::shared_ptr<GameObject> &object, const float &deltaTime, const std::shared_ptr<Draw> grid);
 
 protected:
 	size_t _lastFrame;

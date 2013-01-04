@@ -28,9 +28,15 @@ bool Enemy::getIsCooldown() const{
 	return true;
 }
 
+void Enemy::decrementCooldown(const float &deltaTime){
+	if(_spawnCooldown > 0){
+		_spawnCooldown -= deltaTime * 10;
+		//return;
+	}
+}
 
 
-void Enemy::Chase(std::shared_ptr<GameObject> &player, const float &deltaTime){
+void Enemy::Chase(std::shared_ptr<GameObject> &player, const float &deltaTime, const std::shared_ptr<Draw> grid){
 
 	if(_spawnCooldown > 0){
 		_spawnCooldown -= deltaTime * 10;

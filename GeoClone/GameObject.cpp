@@ -2,6 +2,7 @@
 #include <list>
 
 #include "Draw.h"
+#include "Enemy.h"
 #include "GameObject.h"
 
 GameObject::GameObject(int width, int height, float posX, float posY, float directionX, float directionY, float speed, float angle, int objectType, bool isAlive){
@@ -237,7 +238,7 @@ void GameObject::resurrect(int width, int height, float posX, float posY, int ob
 
 }
 
-void GameObject::Chase(std::shared_ptr<GameObject> &object, const float &deltaTime){
+void GameObject::Chase(std::shared_ptr<GameObject> &object, const float &deltaTime, const std::shared_ptr<Draw> grid){
 	//Implemented in Enemy
 }
 
@@ -275,7 +276,7 @@ bool GameObject::CheckCollision(std::shared_ptr<GameObject> &objectCheck){
 	} else {
 		//If the objects are the same type, then they should not overlap (Mainly enemies...)
 		if( getObjectType() == objectCheck->getObjectType() ){
-			if(getObjectType() == BULLET) //If bullet, escape. Bullet will stick otherwise.
+			if(getObjectType() == BULLET || getObjectType() == ENEMY_PURPLE_MINI || getObjectType() == ENEMY_ORANGE ) //If bullet, escape. Bullet will stick otherwise.
 				return false;
 			float x = objectCheck->getX() - getX();
 			float y = objectCheck->getY() - getY();

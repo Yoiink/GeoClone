@@ -31,7 +31,7 @@ bool Player::setIsAlive(const bool aliveStatus){
 }
 
 void Player::Update(const float &deltaTime){
-		//Add logic code here
+
 	if(_immunityTimer > 0){
 		_immunityTimer -= deltaTime * 10;
 		HAPI->RenderText(0, 60, HAPI_TColour(), std::to_string(_immunityTimer));

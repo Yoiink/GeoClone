@@ -481,7 +481,7 @@ void World::update(){
 			entity->setY(entity->getY() + changeInGridY);
 
 			entity->Update(_deltaTime);			//Current used to update frame animations
-			entity->Chase(_Geo, _deltaTime);	//If the entity is an enemy, it will call the correct chase function
+			entity->Chase(_Geo, _deltaTime, _render);	//If the entity is an enemy, it will call the correct chase function
 			_render->distortGrid(entity);		//Distort the grid a little depending on entity position.
 
 			//Check for a collision.

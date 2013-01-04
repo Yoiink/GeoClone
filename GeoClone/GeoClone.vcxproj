@@ -165,6 +165,7 @@
     <ClCompile Include="Draw.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="EnemyBlue.cpp" />
+    <ClCompile Include="EnemyOrange.cpp" />
     <ClCompile Include="EnemyPurple.cpp" />
     <ClCompile Include="EvolvedGame.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="Draw.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="EnemyBlue.h" />
+    <ClInclude Include="EnemyOrange.h" />
     <ClInclude Include="EnemyPurple.h" />
     <ClInclude Include="EvolvedGame.h" />
     <ClInclude Include="GameObject.h" />

@@ -2,6 +2,7 @@
 //#include "Enemy.h"
 #include "EnemyPurple.h"
 #include "EnemyBlue.h"
+#include "EnemyOrange.h"
 #include "SoundManager.h"
 
 
@@ -31,6 +32,10 @@ bool EvolvedGame::loadAssets(){
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
 	if(!(_gameAssets.back()->Load("images/particle_green.png", LOAD_IMAGE, "particle_green", _gameAssets.size() - 1)))
+		return false;
+
+	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
+	if(!(_gameAssets.back()->Load("images/particle_orange.png", LOAD_IMAGE, "particle_orange", _gameAssets.size() - 1)))
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
@@ -69,6 +74,9 @@ bool EvolvedGame::loadAssets(){
 	if(!(_gameAssets.back()->Load("images/enemy_blue.png", LOAD_IMAGE, "enemy_blue", _gameAssets.size() - 1)))
 		return false;
 
+	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
+	if(!(_gameAssets.back()->Load("images/enemy_orange.png", LOAD_IMAGE, "enemy_orange", _gameAssets.size() - 1)))
+		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
 	if(!(_gameAssets.back()->Load("images/bg_parallax.png", LOAD_IMAGE, "enemy_purple", _gameAssets.size() - 1)))
@@ -134,8 +142,8 @@ void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList,
 
 	if(_spawnCooldown < _currentTime){
 		if(_spawnComplete){
-			//_spawnMode = rand() % 5;
-			_spawnMode = -2;
+			_spawnMode = rand() % 15;
+			//_spawnMode = -2;
 			_spawnComplete = false;
 			_timeLastSpawn = _currentTime;
 		}
@@ -146,41 +154,7 @@ void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList,
 		float playRight = screen->getGridX() + screen->getWidth() - 40;
 		float playBottom = screen->getGridY() + screen->getHeight() - 40;
 
-		if(_spawnMode == -2){
-			int maxEnemies = 16;
-			
-			for(int enemyCount = 0; enemyCount < maxEnemies; enemyCount++){
-				float angle = (enemyCount * (360.0f / maxEnemies));
-				float xAdd = 1*cos(angle);
-				float yAdd = 1*sin(angle);
-				int spawnDistance = 300;
-
-				float calcSpawnX = Geo->getX() + (xAdd * spawnDistance);
-				float calcSpawnY = Geo->getY() + (yAdd * spawnDistance);
-
-				if(calcSpawnX < playLeft)
-					calcSpawnX = playLeft + 10;
-				
-
-				if(calcSpawnY < playTop)
-					calcSpawnY = playTop + 10;
-				
-
-				if(calcSpawnX > playRight)
-					calcSpawnX = playRight - 40;
-
-				if(calcSpawnY > playBottom)
-					calcSpawnY = playBottom - 40;
-
-				entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(calcSpawnX, calcSpawnY, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-				sound->playAudio(PURPLE_SPAWN);
-
-				_spawnCooldown = _currentTime + 1000;
-
-			}
-		}
-
-		if(_spawnMode <= 3){ //NORMAL SPAWN
+		if(_spawnMode <= 3){ //Spawn from corners and 4 random spawns
 			if(_timeLastSpawn <= _currentTime){
 				if(_spawnWave < 5){
 					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(playLeft, playTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
@@ -213,11 +187,11 @@ void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList,
 
 					_spawnComplete = true;
 					_spawnWave = 0;
-					_spawnCooldown = _currentTime + 5000;
+					_spawnCooldown = _currentTime + 3000;
 				}
 				_spawnWave++;
 			}
-		} else if(_spawnMode > 3){ //SPECIAL SPAWN -- Box -- Set to 4
+		} else if(_spawnMode >= 4 && _spawnMode <= 5){ //Spawns a box around the player
 
 			float boxLeft = Geo->getX() - 400;
 			float boxRight = Geo->getX() + 400;
@@ -239,26 +213,225 @@ void EvolvedGame::spawnWaves(std::list<std::shared_ptr<GameObject>> &entityList,
 
 			rowGap = (boxBottom - boxTop) / 5;
 
-			for(int rowCount = 1; rowCount < 6; rowCount++){
-				if(rowCount == 1){
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft, boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft + 200, boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(Geo->getX(), boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight, boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight - 200, boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-				} else if(rowCount == 5){
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft, boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft + 200, boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(Geo->getX(), boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight, boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight - 200, boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+			//Random between blue spawn/purple spawn
+			if(rand() % 100 > 50){
+
+				for(int rowCount = 1; rowCount < 6; rowCount++){
+					if(rowCount == 1){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft, boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft + 200, boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(Geo->getX(), boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight, boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight - 200, boxTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+					} else if(rowCount == 5){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft, boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft + 200, boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(Geo->getX(), boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight, boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight - 200, boxBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+					} else {
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft, boxTop + rowGap * rowCount, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight, boxTop + rowGap * rowCount, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+					}
 				}
-				entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxLeft, boxTop + rowGap * rowCount, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
-				entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(boxRight, boxTop + rowGap * rowCount, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+
+			} else {
+				for(int rowCount = 1; rowCount < 6; rowCount++){
+					if(rowCount == 1){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxLeft, boxTop, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxLeft + 200, boxTop, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(Geo->getX(), boxTop, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxRight, boxTop, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxRight - 200, boxTop, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+					} else if(rowCount == 5){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxLeft, boxBottom, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxLeft + 200, boxBottom, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(Geo->getX(), boxBottom, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxRight, boxBottom, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxRight - 200, boxBottom, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+					} else {
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxLeft, boxTop + rowGap * rowCount, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(boxRight, boxTop + rowGap * rowCount, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+					}
+				}
 			}
+
+			_spawnComplete = true;
+			_spawnWave = 0;
+			_spawnCooldown = _currentTime + 6000;
+		} else if(_spawnMode >= 6 && _spawnMode <= 8){  //Spawns a circle around the player 
+			int maxEnemies = 16;
+			
+			for(int enemyCount = 0; enemyCount < maxEnemies; enemyCount++){
+				float angle = (enemyCount * (360.0f / maxEnemies));
+				float xAdd = 1*cos(angle);
+				float yAdd = 1*sin(angle);
+				int spawnDistance = 300;
+
+				float calcSpawnX = Geo->getX() + (xAdd * spawnDistance);
+				float calcSpawnY = Geo->getY() + (yAdd * spawnDistance);
+
+				if(calcSpawnX < playLeft)
+					calcSpawnX = playLeft + 10;
+				
+
+				if(calcSpawnY < playTop)
+					calcSpawnY = playTop + 10;
+				
+
+				if(calcSpawnX > playRight)
+					calcSpawnX = playRight - 40;
+
+				if(calcSpawnY > playBottom)
+					calcSpawnY = playBottom - 40;
+
+				//Random between blue spawn/purple spawn
+				if(rand() % 100 > 50){
+					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(calcSpawnX, calcSpawnY, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+					sound->playAudio(PURPLE_SPAWN);
+				} else {
+					entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(calcSpawnX, calcSpawnY, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+					sound->playAudio(BLUE_SPAWN);
+				}
+
+			}
+				
+			_spawnComplete = true;
+			_spawnWave = 0;
+			_spawnCooldown = _currentTime + 1000;
+
+		} else if(_spawnMode >= 9 && _spawnMode <= 10){ //Spawn 20 random enemies randomly every 100 milliseconds
+			if(_spawnWave != 20){
+
+				float xPos = rand() % static_cast<int>(playRight) + playLeft;
+				float yPos = rand() % static_cast<int>(playBottom) + playTop;
+
+				//Random between blue spawn/purple spawn
+				if(rand() % 100 > 50){
+					entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(xPos, yPos, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+					sound->playAudio(PURPLE_SPAWN);
+				} else {
+					entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(xPos, yPos, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+					sound->playAudio(BLUE_SPAWN);
+				}
+
+				_spawnWave++;
+				_spawnCooldown = _currentTime + 100;
+			} else {
 				_spawnComplete = true;
 				_spawnWave = 0;
-				_spawnCooldown = _currentTime + 10000;
+				_spawnCooldown = _currentTime + 5000;
+			}
+		} else if(_spawnMode >= 11 && _spawnMode <= 12){ //Spawn random enemies from a random wall (Blue / Purple)
+			int enemiesToSpawn = 10;
+			int wallSelect = rand() % 4;
+			float enemyOffset = 0;
+
+			switch(wallSelect){
+			case 0: //LEFT WALL
+				enemyOffset = ((playTop + 20) + (playBottom - 20)) / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+					//Random between blue spawn/purple spawn
+					if(rand() % 100 > 50){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(playLeft, playTop + (enemyCounter * enemyOffset), getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						sound->playAudio(PURPLE_SPAWN);
+					} else {
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(playLeft, playTop + (enemyCounter * enemyOffset), getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						sound->playAudio(BLUE_SPAWN);
+					}
+				}
+				break;
+			case 1: //RIGHT WALL
+				enemyOffset = ((playTop + 20) + (playBottom - 20)) / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+					//Random between blue spawn/purple spawn
+					if(rand() % 100 > 50){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(playRight, playTop + (enemyCounter * enemyOffset), getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						sound->playAudio(PURPLE_SPAWN);
+					} else {
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(playRight, playTop + (enemyCounter * enemyOffset), getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						sound->playAudio(BLUE_SPAWN);
+					}
+				}
+				break;
+			case 2: //TOP WALL
+				enemyOffset = ((playLeft + 20) + (playRight - 20)) / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+					//Random between blue spawn/purple spawn
+					if(rand() % 100 > 50){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(playLeft + (enemyCounter * enemyOffset), playTop, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						sound->playAudio(PURPLE_SPAWN);
+					} else {
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(playLeft + (enemyCounter * enemyOffset), playTop, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						sound->playAudio(BLUE_SPAWN);
+					}
+				}
+				break;
+			case 3: //BOTTOM WALL
+				enemyOffset = ((playLeft + 20) + (playRight - 20)) / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+					//Random between blue spawn/purple spawn
+					if(rand() % 100 > 50){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyPurple(playLeft + (enemyCounter * enemyOffset), playBottom, getAssetID("enemy_purple"), getAssetID("particle_purple"))));
+						sound->playAudio(PURPLE_SPAWN);
+					} else {
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyBlue(playLeft + (enemyCounter * enemyOffset), playBottom, getAssetID("enemy_blue"), getAssetID("particle_blue"))));
+						sound->playAudio(BLUE_SPAWN);
+					}
+				}
+				break;
+			}
+
+			_spawnComplete = true;
+			_spawnWave = 0;
+			_spawnCooldown = _currentTime + 5000;
+
+		} else if(_spawnMode >= 13){ //Spawn orange from wall
+			int enemiesToSpawn = 10;
+			int wallSelect = rand() % 4;
+			float enemyOffset = 0;
+
+			switch(wallSelect){
+			case 0: //LEFT WALL
+				enemyOffset = ((playTop + 20) + (playBottom - 20)) / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyOrange(playLeft, playTop + (enemyCounter * enemyOffset), getAssetID("enemy_orange"), getAssetID("particle_orange"))));
+						entityList.front()->setDirectionX(1);
+				}
+				sound->playAudio(ORANGE_SPAWN);
+				break;
+			case 1: //RIGHT WALL
+				enemyOffset = ((playTop + 20) + (playBottom - 20)) / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+					//Random between blue spawn/purple spawn
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyOrange(playRight, playTop + (enemyCounter * enemyOffset), getAssetID("enemy_orange"), getAssetID("particle_orange"))));
+						entityList.front()->setDirectionX(-1);
+				}
+				sound->playAudio(ORANGE_SPAWN);
+				break;
+			case 2: //TOP WALL
+				enemyOffset = ((playLeft + 20) + (playRight - 20)) / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyOrange(playLeft + (enemyCounter * enemyOffset), playTop, getAssetID("enemy_orange"), getAssetID("particle_orange"))));
+						entityList.front()->setDirectionY(1);
+				}
+				sound->playAudio(ORANGE_SPAWN);
+				break;
+			case 3: //BOTTOM WALL
+				enemyOffset = ((playLeft + 20) + (playRight - 20)) / enemiesToSpawn;
+				for(int enemyCounter = 0; enemyCounter < enemiesToSpawn; enemyCounter++){
+						entityList.push_front(std::shared_ptr<Enemy>(new EnemyOrange(playLeft + (enemyCounter * enemyOffset), playBottom, getAssetID("enemy_orange"), getAssetID("particle_orange"))));
+						entityList.front()->setDirectionY(-1);
+				}
+				sound->playAudio(ORANGE_SPAWN);
+				break;
+			}
+
+			_spawnComplete = true;
+			_spawnWave = 0;
+			_spawnCooldown = _currentTime + 1000;
+
+
 		}
 	}
 }
@@ -295,6 +468,9 @@ bool EvolvedGame::addScore(int entityID){
 		break;
 	case ENEMY_PURPLE_MINI:
 		_gameScore += 25;
+		break;
+	case ENEMY_ORANGE:
+		_gameScore += 500;
 		break;
 	}
 

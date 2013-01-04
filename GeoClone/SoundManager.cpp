@@ -17,6 +17,7 @@ SoundManager::SoundManager(void)
 	_sounds.push_back(loadSound("sounds/enemy_blue_spawn.ogg"));
 	_sounds.push_back(loadSound("sounds/enemy_green_spawn.ogg"));
 	_sounds.push_back(loadSound("sounds/enemy_purple_spawn.ogg"));
+	_sounds.push_back(loadSound("sounds/enemy_orange_spawn.ogg"));
 
 }
 

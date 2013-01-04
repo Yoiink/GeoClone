@@ -13,8 +13,8 @@ SelectMenu::SelectMenu(std::shared_ptr<SoundManager> &soundManager) :
 	//Spaces to align text, may be quicker than calculating their positions...
 	_menuItems.push_back("     Evolved");
 	_menuItems.push_back("   Deadline");
-	_menuItems.push_back("Not Availible");
-	_menuItems.push_back("Not Availible");
+	_menuItems.push_back("Not Available");
+	_menuItems.push_back("Not Available");
 	_startX = 0;
 	_startY = 0;
 	_selectedItem = 0;
