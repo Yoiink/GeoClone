@@ -16,7 +16,47 @@
 //											//
 //////////////////////////////////////////////////////////////////////////////////////////
 
-Update (FINAL ICA HAND IN) - 03/01/2013 (Happy New Year)
+Update 04/01/2013
+
+New Functionality
+-----------------
+
+- Highscore for each game mode
+- Added lives/specific mode mechanics
+- Game mode tweaks + Orange Enemy
+- New "Waves" game mode
+- More spawn waves on Deadline/Evolved
+
+Code Additions
+--------------
+
+- Changed how the highscore works as now the game modes know what their own highscore file is called
+  so they read/write to the correct one.
+- Lives can now be done within the game mode. So if Geo is marked dead, it checks with the game mode
+  to see if should still be alive.
+- New orange enemy that moves in a linear way over the grid. Had to change the enemy class a little to
+  allow this to work but it's all good.
+- Due to the new enemy, there's a new mode called "Waves" which is pretty much waves of the orange enemy
+  plus some of the others thrown in to make it a little harder.
+
+Tests
+-----
+
+- Highscore test was simple, just had to check if the data loading/writing was correct.
+- Lives/specific game mode mechanics were obvious too.
+- Had to make sure the orange enemy works as expected. Checked particles, if collision works, spawn cooldown
+- Lots of play testing to test the Waves mode.
+
+Notes
+-----
+I'm quite glad I got the above features in as it makes the game feel a lot more fun now with the choice of
+game types. I would still like to have added some more enemies but I think they may be a bit of a pain due
+to how they work.
+
+______________________________________________________________________________________________________
+
+
+Update (FINAL ICA HAND IN?) - 03/01/2013 (Happy New Year)
 
 New Functionality
 -----------------
