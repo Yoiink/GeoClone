@@ -16,6 +16,19 @@
 //											//
 //////////////////////////////////////////////////////////////////////////////////////////
 
+
+Bug Fix 04/02/2013
+Keith ran the game in the lecture theater and there was an obvious bug. This was due to
+me testing the game with an Xbox Controller plugged in all the time and when testing to
+see if the controller had been unplugged I just simply unpluged "Oh it works" and plugged
+it back in.
+
+Anyhow, when there ISNT a controller plugged in, the variables are all wierd and trigger
+menues to be switched and even if you get passed that, the gameplay is all wrong.
+
+Anyhow, this is a fix to address the issue.
+
+
 Update 04/01/2013
 
 New Functionality

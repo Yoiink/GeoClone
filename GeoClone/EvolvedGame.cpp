@@ -35,6 +35,10 @@ bool EvolvedGame::loadAssets(){
 		return false;
 
 	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
+	if(!(_gameAssets.back()->Load("images/particle_orange.png", LOAD_IMAGE, "particle_orange", static_cast<int>(_gameAssets.size() - 1))))
+		return false;
+
+	_gameAssets.push_back(std::shared_ptr<Asset>(new Asset()));
 	if(!(_gameAssets.back()->Load("images/particle_trail.png", LOAD_IMAGE, "particle_trail", static_cast<int>(_gameAssets.size() - 1))))
 		return false;
 	if(!_gameAssets.back()->loadAnimation(32, 4, 4))

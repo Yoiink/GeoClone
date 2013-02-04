@@ -192,18 +192,19 @@ bool World::setupWorld(){
 void World::update(){
 
 	if(_inMenues){
+
 		_controllers->updateControllers();
 		HAPI_TControllerData controllerData = _controllers->getXbox();
 		HAPI_TKeyboardData keyboardData = _controllers->getKeyboard();
 
-		if(controllerData.digitalButtons[HK_DIGITAL_DPAD_UP] || controllerData.digitalButtons[HK_DIGITAL_DPAD_DOWN] ||
+		if(controllerData.digitalButtons[HK_DIGITAL_DPAD_UP] == 1 || controllerData.digitalButtons[HK_DIGITAL_DPAD_DOWN] == 1 ||
 			keyboardData.scanCode['W'] || keyboardData.scanCode['S']){
 			int changeDirection = 0;
 
-			if(controllerData.digitalButtons[HK_DIGITAL_DPAD_UP] || keyboardData.scanCode['W'])
+			if(controllerData.digitalButtons[HK_DIGITAL_DPAD_UP] == 1 || keyboardData.scanCode['W'])
 				changeDirection -= 1;
 
-			if(controllerData.digitalButtons[HK_DIGITAL_DPAD_DOWN] || keyboardData.scanCode['S'])
+			if(controllerData.digitalButtons[HK_DIGITAL_DPAD_DOWN] == 1 || keyboardData.scanCode['S'])
 				changeDirection += 1;
 
 			//Borrow the nextShot variable (normally used for bullets) to create a cooldown on the menu selection.
@@ -213,7 +214,7 @@ void World::update(){
 			}
 		}
 
-		if(controllerData.digitalButtons[HK_DIGITAL_A] || keyboardData.scanCode[HK_SPACE]){
+		if(controllerData.digitalButtons[HK_DIGITAL_A] == 1 || keyboardData.scanCode[HK_SPACE]){
 			//Borrow the nextShot variable (normally used for bullets) to create a cooldown on the menu selection.
 			if(HAPI->GetTime() > _nextShot){
 				_gameMenu->selectedItem(_inMenues, _gameMenu, shared_from_this());
@@ -354,74 +355,76 @@ void World::update(){
 
 		//Left Stick OR WASD
 		//Offset X/Y
-		if(controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] > HK_GAMEPAD_LEFT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] > HK_GAMEPAD_LEFT_THUMB_DEADZONE ||
-			controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] < -HK_GAMEPAD_LEFT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] < -HK_GAMEPAD_LEFT_THUMB_DEADZONE ){
+		if(_controllers->usingXbox()){
+			if(controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] > HK_GAMEPAD_LEFT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] > HK_GAMEPAD_LEFT_THUMB_DEADZONE ||
+				controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] < -HK_GAMEPAD_LEFT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] < -HK_GAMEPAD_LEFT_THUMB_DEADZONE ){
 
-				//Give Geo an angle so it can be rendered correctly later.
-				float angle = atan2( ((controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] * -1) - _Geo->getY()), controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] - _Geo->getX());
-				_Geo->setAngle(angle);
+					//Give Geo an angle so it can be rendered correctly later.
+					float angle = atan2( ((controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] * -1) - _Geo->getY()), controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] - _Geo->getX());
+					_Geo->setAngle(angle);
 
-				//Calculate the new X and Y position of Geo
-				float newX = (_Geo->getX() + ((controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] / 10000.0f) * _deltaTime));
-				float newY = (_Geo->getY() + (((controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] / 10000.0f) * -1) * _deltaTime));
+					//Calculate the new X and Y position of Geo
+					float newX = (_Geo->getX() + ((controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_X] / 10000.0f) * _deltaTime));
+					float newY = (_Geo->getY() + (((controllerData.analogueButtons[HK_ANALOGUE_LEFT_THUMB_Y] / 10000.0f) * -1) * _deltaTime));
 
-				//Check if the newX position is within the correct bounds (X axis)
-				if( (newX > _render->getGridX() + 5) && (newX < (_render->getGridX() + _render->getWidth() - (_Geo->getWidth() + 5)) )){
-					_Geo->setX(newX);
-				}
-
-				//Check if the newY position is within the correct bounds (Y axis)
-				if ( (newY > _render->getGridY() + 5) && (newY < (_render->getGridY() + _render->getHeight() - (_Geo->getHeight() + 5)) )){
-					_Geo->setY(newY);
-				}
-
-				//Create an emitter for the tail of Geo using the opposit angle
-				_emitterList.push_back(std::shared_ptr<ParticleEmitter>(new ParticleEmitter(_Geo->getX() + _Geo->getWidth() / 2, _Geo->getY() + _Geo->getHeight() / 2, 1, _gameMode->getAssetID("particle_trail"), angle - static_cast<float>(floor(0.5 + M_PI)))));
-
-		} 
-
-		//Right Stick
-		if(controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] > HK_GAMEPAD_RIGHT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] > HK_GAMEPAD_RIGHT_THUMB_DEADZONE ||
-			controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] < -HK_GAMEPAD_RIGHT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] < -HK_GAMEPAD_RIGHT_THUMB_DEADZONE ){
-
-				//Check to see if enough time has passed to shoot a bullet
-				if(_currentTime > _nextShot){
-
-					//Play the bullet sound
-					_soundManager->playAudio(BULLET_SOUND);
-
-					//Calculate the angle to shoot the bullet at
-					float angle = atan2( (controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] - _Geo->getX()) * -1, controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] - _Geo->getY());
-
-					//Remove 5 degrees from shooting angle, as we shoot 3 bullets, we want to spray like \|/ so start 5 degrees less
-					//Hard coded so less calculation at runtime
-					angle -= 0.08726646259f;
-
-					float bulletX = _Geo->getX() + (_Geo->getWidth() / 2) - 8;
-					float bulletY = _Geo->getY() + (_Geo->getHeight() / 2) - 8;
-
-					//Loop over each bullet and set it up, need to loop to apply the different angle
-					for(int curBullet = 0; curBullet < 3; curBullet++){
-						_entityList.push_front(std::shared_ptr<Bullet>(new Bullet(16,16, bulletX, bulletY, 
-							1*cosf(angle + ((curBullet * 5) * static_cast<float>(M_PI) / 180.f)),
-							1*sinf(angle + ((curBullet * 5) * static_cast<float>(M_PI) / 180.f)),
-							10.f + rand() % 3, angle + 1.5f) ));
-
-						_entityList.front()->setTexture(_gameMode->getAssetID("bullet"));
-						_entityList.front()->setDeathTexture(_gameMode->getAssetID("particle_bullet"));
+					//Check if the newX position is within the correct bounds (X axis)
+					if( (newX > _render->getGridX() + 5) && (newX < (_render->getGridX() + _render->getWidth() - (_Geo->getWidth() + 5)) )){
+						_Geo->setX(newX);
 					}
 
-					//Add delay to the currentTime to create the delay for the next bullet.
-					_nextShot = _currentTime + 100;
+					//Check if the newY position is within the correct bounds (Y axis)
+					if ( (newY > _render->getGridY() + 5) && (newY < (_render->getGridY() + _render->getHeight() - (_Geo->getHeight() + 5)) )){
+						_Geo->setY(newY);
+					}
 
-				}
+					//Create an emitter for the tail of Geo using the opposit angle
+					_emitterList.push_back(std::shared_ptr<ParticleEmitter>(new ParticleEmitter(_Geo->getX() + _Geo->getWidth() / 2, _Geo->getY() + _Geo->getHeight() / 2, 1, _gameMode->getAssetID("particle_trail"), angle - static_cast<float>(floor(0.5 + M_PI)))));
 
-		}
+			} 
 
-		//If the start button is pressed, launch the paused menu
-		if(controllerData.digitalButtons[HK_DIGITAL_START]){
-			_inMenues = true;
-			_gameMenu.reset(new PauseMenu(_soundManager));
+			//Right Stick
+			if(controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] > HK_GAMEPAD_RIGHT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] > HK_GAMEPAD_RIGHT_THUMB_DEADZONE ||
+				controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] < -HK_GAMEPAD_RIGHT_THUMB_DEADZONE || controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] < -HK_GAMEPAD_RIGHT_THUMB_DEADZONE ){
+
+					//Check to see if enough time has passed to shoot a bullet
+					if(_currentTime > _nextShot){
+
+						//Play the bullet sound
+						_soundManager->playAudio(BULLET_SOUND);
+
+						//Calculate the angle to shoot the bullet at
+						float angle = atan2( (controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_Y] - _Geo->getX()) * -1, controllerData.analogueButtons[HK_ANALOGUE_RIGHT_THUMB_X] - _Geo->getY());
+
+						//Remove 5 degrees from shooting angle, as we shoot 3 bullets, we want to spray like \|/ so start 5 degrees less
+						//Hard coded so less calculation at runtime
+						angle -= 0.08726646259f;
+
+						float bulletX = _Geo->getX() + (_Geo->getWidth() / 2) - 8;
+						float bulletY = _Geo->getY() + (_Geo->getHeight() / 2) - 8;
+
+						//Loop over each bullet and set it up, need to loop to apply the different angle
+						for(int curBullet = 0; curBullet < 3; curBullet++){
+							_entityList.push_front(std::shared_ptr<Bullet>(new Bullet(16,16, bulletX, bulletY, 
+								1*cosf(angle + ((curBullet * 5) * static_cast<float>(M_PI) / 180.f)),
+								1*sinf(angle + ((curBullet * 5) * static_cast<float>(M_PI) / 180.f)),
+								10.f + rand() % 3, angle + 1.5f) ));
+
+							_entityList.front()->setTexture(_gameMode->getAssetID("bullet"));
+							_entityList.front()->setDeathTexture(_gameMode->getAssetID("particle_bullet"));
+						}
+
+						//Add delay to the currentTime to create the delay for the next bullet.
+						_nextShot = _currentTime + 100;
+
+					}
+
+			}
+
+			//If the start button is pressed, launch the paused menu
+			if(controllerData.digitalButtons[HK_DIGITAL_START] == 1){
+				_inMenues = true;
+				_gameMenu.reset(new PauseMenu(_soundManager));
+			}
 		}
 
 

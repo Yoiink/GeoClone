@@ -3,7 +3,7 @@
 
 ControlInput::ControlInput(void)
 {
-	usingXboxController = true;
+	_usingXboxController = true;
 }
 
 
@@ -14,7 +14,7 @@ ControlInput::~ControlInput(void)
 void ControlInput::updateControllers(){
 
 	//Check to see if the Xbox controller is plugged in or not.
-	if(usingXboxController){
+	if(_usingXboxController){
 		if(!HAPI->GetControllerData(0, &controllerData)){ //Check controller data, if false, run if statement.
 			HAPI_UserResponse keepController;
 			HAPI->UserMessage("You have unplugged your controller. Would you like to continue using a controller?", "Controller Unplugged!", eButtonTypeYesNo, &keepController);
@@ -23,12 +23,12 @@ void ControlInput::updateControllers(){
 				while( (!HAPI->GetControllerData(0, &controllerData)) && (keepChecking = eUserResponseYes)){
 					HAPI->UserMessage("Still can't detect your controller. Try again?", "Controller Unplugged!", eButtonTypeYesNo, &keepChecking);
 					if(keepChecking = eUserResponseNo){
-						usingXboxController = false;
+						_usingXboxController = false;
 						break;
 					}
 				}
 			} else {
-				usingXboxController = false;
+				_usingXboxController = false;
 			}
 		}
 	}
@@ -54,4 +54,8 @@ HAPI_TKeyboardData ControlInput::getKeyboard() const{
 
 HAPI_TMouseData ControlInput::getMouse() const{
 	return _mouseData;
+}
+
+bool ControlInput::usingXbox() const{
+	return _usingXboxController;
 }
